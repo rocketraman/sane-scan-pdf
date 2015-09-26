@@ -1,0 +1,164 @@
+#!/bin/sh
+
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+DEVICE=fujitsu
+OUTPUT=scan.pdf
+APPEND=0
+RESOLUTION=300
+MODE=Lineart
+SCRIPT="$DIR/scan_perpage"
+DUPLEX=0
+DESKEW=0
+SEARCHABLE=0
+MAXPAGE=
+TRUNCPAGE=0
+HELP=0
+SIZE=Letter
+PGHEIGHT=
+PGHEIGHTIN=11
+PGWIDTH=
+PGWIDTHIN=8.5
+VERBOSE=0
+
+# The unpaper processing reduces the file size considerably, so 300 dpi is selected.
+# When not using unpaper (--nodskew) it is recommended to scan at a lower resolution e.g. 200 dpi.
+
+# Parse command-line options
+while [ $# -gt 0 ]; do
+  case "$1" in
+
+  -v|--verbose) VERBOSE=1 ;;
+
+  -d|--duplex) DUPLEX=1 ;;
+
+  -m|--mode) shift; MODE=$1 ;;
+
+  -r|--resolution) shift; RESOLUTION=$1 ;;
+
+  -o|--output) shift; OUTPUT=$1 ;;
+
+  -a|--append) APPEND=1 ;;
+
+  -e|--max) shift; MAXPAGE=$1 ;;
+
+  -t|--truncate) shift; TRUNCPAGE=$1 ;;
+
+  -h|--help) HELP=1 ;;
+
+  -s|--size) shift; SIZE=$1 ;;
+
+  -ph|--page-height) shift; PGHEIGHT=$1 ;;
+
+  -pw|--page-width) shift; PGWIDTH=$1 ;;
+
+  --dskew|--deskew) DESKEW=1 ;;
+
+  --searchable|--ocr) SEARCHABLE=1 ;;
+
+  esac
+  shift   # next option
+done
+
+
+if [ $HELP -eq 1 ]; then
+  echo "$(basename $0) [-d|--duplex] [-m|--mode] [-r|--resolution] [-o|--output] [-a|--append] [-e|--max] [-s|--size | [-ph|--page-height] [-pw|--page-width]] [--nodskew]"
+  echo " -v Verbose output (this will slow down the scan due to the need to prevent interleaved output)"
+  echo " -d Duplex scanning"
+  echo " -m Mode e.g. Lineart (default), Halftone, Gray, Color, etc."
+  echo " -r Resolution e.g 300 (default)"
+  echo " -o Output e.g. scan.pdf (default)"
+  echo " -a Append output to existing scan"
+  echo " -e Max number of pages e.g. 2 (default is all pages)"
+  echo " -t Truncate number of pages from end e.g. 1 (default is none)"
+  echo " -s Page Size as type e.g. Letter (default), Legal, A4"
+  echo " -ph Custom Page Height in mm"
+  echo " -pw Custom Page Width in mm"
+  echo " --nodskew Do not deskew (no unpaper)"
+  echo ""
+  exit 0
+fi
+
+if [ -f "$OUTPUT" -a ! $APPEND = 1 ]; then
+  echo >&2 "Output file $OUTPUT already exists. Delete or specify -a. Aborting."
+  exit 1
+fi
+
+SOURCE=""
+if [ $DUPLEX -eq 1 ]; then
+  SOURCE="--source \"ADF Duplex\""
+fi
+
+if [ "$MAXPAGE" != "" ]; then
+  MAXPAGE="-e $MAXPAGE"
+fi
+
+PS2PDF_OPTS=
+
+# Specify non-letter sizes in mm
+case "$SIZE" in
+
+  Letter) PGHEIGHTIN=11; PGWIDTHIN=8.5 ;;
+
+  Legal) PGHEIGHT=355.6; PGWIDTH=215.9 ;;
+
+  A4) PGHEIGHT=297; PGWIDTH=210 ;;
+
+esac
+
+if [ "$PGHEIGHT" != "" ]; then
+  PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
+  PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
+  PS2PDF_OPTS="-dEPSCrop"
+fi
+
+if [ "$PGWIDTH" != "" ]; then
+  PGWIDTHIN=$(units --compact -1 "$PGWIDTH mm" 'in')
+  PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
+  PS2PDF_OPTS="-dEPSCrop"
+fi
+
+export VERBOSE
+export DESKEW
+export SEARCHABLE
+export RESOLUTION
+export PGWIDTHIN
+export PGHEIGHTIN
+export PS2PDF_OPTS
+
+if [ $VERBOSE = 1 ]; then
+  LOCKFILE=$(mktemp)
+  trap "rm -rf $LOCKFILE" 0
+  export LOCKFILE
+fi;
+
+echo >&2 "Scanning..."
+#eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
+eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
+
+numscans=$(ls scan-[0-9]*.pdf | wc -w)
+if [ $numscans -gt 0 ]; then
+  echo ""
+  echo "Processing $numscans pages"
+  if [ $TRUNCPAGE -gt 0 ]; then
+    source /usr/local/bin/stack.sh
+    for x in scan-[0-9]*; do push $x; done;
+    for x in $(seq $TRUNCPAGE); do rm $(pop); done;
+    echo "Truncated $TRUNCPAGE pages"
+  fi
+  if [ $numscans -gt 1 -o $APPEND -eq 1 ]; then
+    echo "Concatenating pdfs..."
+    if [ -f "$OUTPUT" ]; then
+      mv "$OUTPUT" "${OUTPUT}.orig"
+    fi
+    pdfunite $(ls ${OUTPUT}.orig 2>/dev/null) $(ls scan-[0-9]*.pdf) $OUTPUT
+    rm scan-[0-9]*.pdf
+  else
+    mv scan-0*.pdf $OUTPUT
+  fi
+  chown raman:raman $OUTPUT
+  echo ""
+  echo "Done."
+else
+  echo "Found no scans."
+fi
