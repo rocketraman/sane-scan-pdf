@@ -54,10 +54,10 @@ process_page() {
   if [ $DESKEW -eq 1 ]; then
     log "Applying unpaper post-processing to image data..."
     PP_PREFIX="unpaper-"
-    #unpaper -v --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
     if [ $VERBOSE = 1 ]; then
       UNPAPERVERBOSE="-v"
     fi
+    #unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
     unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
   fi
   log ""

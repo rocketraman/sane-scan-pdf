@@ -21,9 +21,6 @@ PGWIDTH=
 PGWIDTHIN=8.5
 VERBOSE=0
 
-# The unpaper processing reduces the file size considerably, so 300 dpi is selected.
-# When not using unpaper (--nodskew) it is recommended to scan at a lower resolution e.g. 200 dpi.
-
 # Parse command-line options
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -62,19 +59,20 @@ done
 
 
 if [ $HELP -eq 1 ]; then
-  echo "$(basename $0) [-d|--duplex] [-m|--mode] [-r|--resolution] [-o|--output] [-a|--append] [-e|--max] [-s|--size | [-ph|--page-height] [-pw|--page-width]] [--nodskew]"
+  echo "$(basename $0) [-v|--verbose] [-d|--duplex] [-m|--mode] [-r|--resolution] [-a|--append] [-e|--max <pages>] [-t|--truncate <pages>] [-s|--size | [-ph|--page-height] [-pw|--page-width]] [--deskew] [--ocr] [-o|--output <outputfile>]"
   echo " -v Verbose output (this will slow down the scan due to the need to prevent interleaved output)"
   echo " -d Duplex scanning"
   echo " -m Mode e.g. Lineart (default), Halftone, Gray, Color, etc."
   echo " -r Resolution e.g 300 (default)"
-  echo " -o Output e.g. scan.pdf (default)"
   echo " -a Append output to existing scan"
   echo " -e Max number of pages e.g. 2 (default is all pages)"
   echo " -t Truncate number of pages from end e.g. 1 (default is none)"
   echo " -s Page Size as type e.g. Letter (default), Legal, A4"
   echo " -ph Custom Page Height in mm"
   echo " -pw Custom Page Width in mm"
-  echo " --nodskew Do not deskew (no unpaper)"
+  echo " --deskew Run deskew and black edge detection (requires unpaper)"
+  echo " --ocr Run OCR to make the PDF searchable (requires tesseract)"
+  echo " -o Output to named file default=scan.pdf"
   echo ""
   exit 0
 fi
