@@ -9,7 +9,7 @@ RESOLUTION=300
 MODE=Lineart
 SCRIPT="$DIR/scan_perpage"
 DUPLEX=0
-DESKEW=0
+UNPAPER=0
 SEARCHABLE=0
 MAXPAGE=
 TRUNCPAGE=0
@@ -19,6 +19,8 @@ PGHEIGHT=
 PGHEIGHTIN=11
 PGWIDTH=
 PGWIDTHIN=8.5
+CROP=0
+DESKEW=0
 VERBOSE=0
 
 # Parse command-line options
@@ -49,7 +51,11 @@ while [ $# -gt 0 ]; do
 
   -pw|--page-width) shift; PGWIDTH=$1 ;;
 
-  --dskew|--deskew) DESKEW=1 ;;
+  --crop) CROP=1 ;;
+
+  --deskew) DESKEW=1 ;;
+
+  --unpaper) UNPAPER=1 ;;
 
   --searchable|--ocr) SEARCHABLE=1 ;;
 
@@ -59,7 +65,7 @@ done
 
 
 if [ $HELP -eq 1 ]; then
-  echo "$(basename $0) [-v|--verbose] [-d|--duplex] [-m|--mode] [-r|--resolution] [-a|--append] [-e|--max <pages>] [-t|--truncate <pages>] [-s|--size | [-ph|--page-height] [-pw|--page-width]] [--deskew] [--ocr] [-o|--output <outputfile>]"
+  echo "$(basename $0) [-v|--verbose] [-d|--duplex] [-m|--mode] [-r|--resolution] [-a|--append] [-e|--max <pages>] [-t|--truncate <pages>] [-s|--size | [-ph|--page-height] [-pw|--page-width]] [--crop] [--deskew] [--unpaper] [--ocr] [-o|--output <outputfile>]"
   echo " -v Verbose output (this will slow down the scan due to the need to prevent interleaved output)"
   echo " -d Duplex scanning"
   echo " -m Mode e.g. Lineart (default), Halftone, Gray, Color, etc."
@@ -70,7 +76,9 @@ if [ $HELP -eq 1 ]; then
   echo " -s Page Size as type e.g. Letter (default), Legal, A4"
   echo " -ph Custom Page Height in mm"
   echo " -pw Custom Page Width in mm"
-  echo " --deskew Run deskew and black edge detection (requires unpaper)"
+  echo " --crop Run driver deskew (driver must support this)"
+  echo " --deskew Run driver deskew (driver must support this)"
+  echo " --unpaper Run deskew and black edge detection (requires unpaper)"
   echo " --ocr Run OCR to make the PDF searchable (requires tesseract)"
   echo " -o Output to named file default=scan.pdf"
   echo ""
@@ -116,8 +124,16 @@ if [ "$PGWIDTH" != "" ]; then
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
+if [ $CROP = 1 ]; then
+  CROP="--swcrop=yes"
+fi
+
+if [ $DESKEW = 1 ]; then
+  DESKEW="--swdeskew=yes"
+fi
+
 export VERBOSE
-export DESKEW
+export UNPAPER
 export SEARCHABLE
 export RESOLUTION
 export PGWIDTHIN
@@ -132,7 +148,7 @@ fi;
 
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
-eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
+eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 
 numscans=$(ls scan-[0-9]*.pdf | wc -w)
 if [ $numscans -gt 0 ]; then

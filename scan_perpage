@@ -7,7 +7,7 @@ usage()
 {
   echo "Usage: $0 <imagefile>"
   echo "Set the following environment variables:"
-  echo "  DESKEW"
+  echo "  UNPAPER"
   echo "  SEARCHABLE"
   echo "  RESOLUTION"
   echo "  PGWIDTHIN"
@@ -38,7 +38,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-if [ "$DESKEW" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" -o "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
+if [ "$UNPAPER" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" -o "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
   usage
   exit 1
 fi
@@ -48,10 +48,10 @@ IMAGE_FILE=$1
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_FILE}, deskew=$DESKEW, searchable=$SEARCHABLE..."
+  log "Post-processing scanned page ${IMAGE_FILE}, deskew=$UNPAPER, searchable=$SEARCHABLE..."
 
   PP_PREFIX=
-  if [ $DESKEW -eq 1 ]; then
+  if [ $UNPAPER -eq 1 ]; then
     log "Applying unpaper post-processing to image data..."
     PP_PREFIX="unpaper-"
     if [ $VERBOSE = 1 ]; then
