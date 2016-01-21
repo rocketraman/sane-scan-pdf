@@ -38,7 +38,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-if [ "$UNPAPER" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" -o "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
+if [ "$UNPAPER" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" ]; then
   usage
   exit 1
 fi
@@ -72,7 +72,13 @@ process_page() {
     if [ $VERBOSE = 1 ]; then
       PNMVERBOSE="-verbose"
     fi
-    pnmtops $PNMVERBOSE -imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN $PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > ${IMAGE_FILE%.*}.pdf | logstdout
+    if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
+      PAGEOPTS="-equalpixels -dpi=$RESOLUTION -noturn"
+    else
+      PAGEOPTS="-imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN"
+    fi
+    log "Using page options: $PAGEOPTS"
+    pnmtops $PNMVERBOSE $PAGEOPTS $PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > ${IMAGE_FILE%.*}.pdf | logstdout
   fi
   
   status=$?

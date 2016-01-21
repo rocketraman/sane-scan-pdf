@@ -4,6 +4,7 @@ DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 DEVICE=fujitsu
 OUTPUT=scan.pdf
+USEARRAY=0
 APPEND=0
 RESOLUTION=300
 MODE=Lineart
@@ -16,9 +17,9 @@ TRUNCPAGE=0
 HELP=0
 SIZE=Letter
 PGHEIGHT=
-PGHEIGHTIN=11
+PGHEIGHTIN=
 PGWIDTH=
-PGWIDTHIN=8.5
+PGWIDTHIN=
 CROP=0
 DESKEW=0
 VERBOSE=0
@@ -125,13 +126,13 @@ case "$SIZE" in
 
 esac
 
-if [ "$PGHEIGHT" != "" ]; then
+if [ $CROP != 1 -a "$PGHEIGHT" != "" ]; then
   PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
   PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
-if [ "$PGWIDTH" != "" ]; then
+if [ $CROP != 1 -a "$PGWIDTH" != "" ]; then
   PGWIDTHIN=$(units --compact -1 "$PGWIDTH mm" 'in')
   PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
   PS2PDF_OPTS="-dEPSCrop"
@@ -139,6 +140,11 @@ fi
 
 if [ $CROP = 1 ]; then
   CROP="--swcrop=yes"
+  PGHEIGHT=
+  PGWIDTH=
+  PGHEIGHTIN=
+  PGWIDTHIN=
+  PS2PDF_OPTS="-dEPSCrop"
 fi
 
 if [ $DESKEW = 1 ]; then
@@ -160,7 +166,7 @@ if [ $VERBOSE = 1 ]; then
 fi;
 
 echo >&2 "Scanning..."
-#eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
+#eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 
 shopt -s extglob nullglob
