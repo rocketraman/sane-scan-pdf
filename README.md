@@ -8,6 +8,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 
 ## Features
 
+* Join scanned pages into a single output file, or specify a name for each page
 * Deskew (if supported by scanner driver, or software-based via unpaper)
 * Crop (if supported by scanner driver)
 * Creates searchable PDFs (with tesseract)
@@ -15,7 +16,6 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Specify resolution
 * Truncate n pages from end of scan e.g. duplex scanning with last page truncated
 * Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
-* Output to single file, or to a list of files
 
 ## Requirements
 
