@@ -189,14 +189,13 @@ echo >&2 "Scanning..."
 eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 
 shopt -s extglob nullglob
-numscans=$(ls scan-[0-9]*.pdf | wc -w)
+pdffiles=(scan-[0-9]*.pdf)
+numscans=${#pdffiles[@]}
 if [ $numscans -gt 0 ]; then
-  echo ""
   echo "Processing $numscans pages"
-  if [ $TRUNCPAGE -gt 0 ]; then
-    source /usr/local/bin/stack.sh
-    for x in scan-[0-9]*; do push $x; done;
-    for x in $(seq $TRUNCPAGE); do rm $(pop); done;
+  if [ $numscans -gt $TRUNCPAGE -a $TRUNCPAGE -gt 0 ]; then
+    for x in ${pdffiles[@]:$numscans-$TRUNCPAGE:$TRUNCPAGE}; do rm "$x"; done;
+    pdffiles=(${pdffiles[@]:0:$numscans-$TRUNCPAGE})
     echo "Truncated $TRUNCPAGE pages"
   fi
   if [ $numscans -gt 1 -a $USEARRAY = 1 ]; then
@@ -205,7 +204,6 @@ if [ $numscans -gt 0 ]; then
     index=0
     while [ "$index" -lt "$output_count" ]; do
       let "scanno = $index + 1"
-      echo "scanno = $scanno"
       if [ -f "${OUTPUT[$index]}" ]; then
         mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
         if [ $APPEND -eq 1 ]; then
@@ -213,8 +211,6 @@ if [ $numscans -gt 0 ]; then
           if [ -f "${OUTPUT[$index]}.orig" ]; then
             pdffiles+=("${OUTPUT[$index]}.orig")
           fi
-          echo "index = $index"
-          echo "scanno = $scanno"
           pdffiles+=(scan-*(0)$scanno.pdf)
           pdfunite "${pdffiles[@]}" "${OUTPUT[$index]}" && rm scan-*(0)$scanno.pdf
         else
@@ -234,7 +230,6 @@ if [ $numscans -gt 0 ]; then
     if [ -f "${OUTPUT}.orig" ]; then
       pdffiles+=("${OUTPUT}.orig")
     fi
-    shopt -s nullglob
     pdffiles+=(scan-[0-9]*.pdf)
     pdfunite "${pdffiles[@]}" "$OUTPUT" && rm scan-[0-9]*.pdf
   else
