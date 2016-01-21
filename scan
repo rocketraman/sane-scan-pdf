@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
@@ -35,8 +35,6 @@ while [ $# -gt 0 ]; do
 
   -r|--resolution) shift; RESOLUTION=$1 ;;
 
-  -o|--output) shift; OUTPUT=$1 ;;
-
   -a|--append) APPEND=1 ;;
 
   -e|--max) shift; MAXPAGE=$1 ;;
@@ -58,6 +56,12 @@ while [ $# -gt 0 ]; do
   --unpaper) UNPAPER=1 ;;
 
   --searchable|--ocr) SEARCHABLE=1 ;;
+
+  -o|--output) shift; OUTPUT="$1" ;;
+
+  -l|--outputlist) shift; USEARRAY=1; OUTPUT=(); OUTPUT+=("$1") ;;
+
+  *) if [ $USEARRAY = 1 ]; then OUTPUT+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
   shift   # next option
@@ -85,9 +89,18 @@ if [ $HELP -eq 1 ]; then
   exit 0
 fi
 
-if [ -f "$OUTPUT" -a ! $APPEND = 1 ]; then
+if [ $USEARRAY = 0 -a -f "$OUTPUT" -a ! $APPEND = 1 ]; then
   echo >&2 "Output file $OUTPUT already exists. Delete or specify -a. Aborting."
   exit 1
+fi
+
+if [ $USEARRAY = 1 -a ! $APPEND = 1 ]; then
+  for o in "${OUTPUT[@]}"; do
+    if [ -f "$o" ]; then
+      echo >&2 "Output file $o already exists. Delete or specify -a. Aborting."
+      exit 1
+    fi
+  done
 fi
 
 SOURCE=""
@@ -150,6 +163,7 @@ echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $SOURCE -o scan-%04d
 eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 
+shopt -s extglob nullglob
 numscans=$(ls scan-[0-9]*.pdf | wc -w)
 if [ $numscans -gt 0 ]; then
   echo ""
@@ -160,17 +174,51 @@ if [ $numscans -gt 0 ]; then
     for x in $(seq $TRUNCPAGE); do rm $(pop); done;
     echo "Truncated $TRUNCPAGE pages"
   fi
-  if [ $numscans -gt 1 -o $APPEND -eq 1 ]; then
+  if [ $numscans -gt 1 -a $USEARRAY = 1 ]; then
+    echo "Naming pdfs based on output list..."
+    output_count=${#OUTPUT[@]}
+    index=0
+    while [ "$index" -lt "$output_count" ]; do
+      let "scanno = $index + 1"
+      echo "scanno = $scanno"
+      if [ -f "${OUTPUT[$index]}" ]; then
+        mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
+        if [ $APPEND -eq 1 ]; then
+          pdffiles=()
+          if [ -f "${OUTPUT[$index]}.orig" ]; then
+            pdffiles+=("${OUTPUT[$index]}.orig")
+          fi
+          echo "index = $index"
+          echo "scanno = $scanno"
+          pdffiles+=(scan-*(0)$scanno.pdf)
+          pdfunite "${pdffiles[@]}" "${OUTPUT[$index]}" && rm scan-*(0)$scanno.pdf
+        else
+          mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+        fi
+      else
+        mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+      fi
+      let "index = $index + 1"
+    done
+  elif [ $numscans -gt 1 -o $APPEND -eq 1 ]; then
     echo "Concatenating pdfs..."
     if [ -f "$OUTPUT" ]; then
       mv "$OUTPUT" "${OUTPUT}.orig"
     fi
-    pdfunite $(ls ${OUTPUT}.orig 2>/dev/null) $(ls scan-[0-9]*.pdf) $OUTPUT
-    rm scan-[0-9]*.pdf
+    pdffiles=()
+    if [ -f "${OUTPUT}.orig" ]; then
+      pdffiles+=("${OUTPUT}.orig")
+    fi
+    shopt -s nullglob
+    pdffiles+=(scan-[0-9]*.pdf)
+    pdfunite "${pdffiles[@]}" "$OUTPUT" && rm scan-[0-9]*.pdf
   else
-    mv scan-0*.pdf $OUTPUT
+    if [ $USEARRAY = 1 ]; then
+      mv scan-0*.pdf "${OUTPUT[0]}"
+    else
+      mv scan-0*.pdf "$OUTPUT"
+    fi
   fi
-  chown raman:raman $OUTPUT
   echo ""
   echo "Done."
 else
