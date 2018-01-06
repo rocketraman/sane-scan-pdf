@@ -23,7 +23,8 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
 
-## Optional
+### Optional
 
 * unpaper (for software deskew)
 * flock (usually provided by util-linux) (for properly ordered verbose logs)
+* tesseract (to make searchable PDFs)
