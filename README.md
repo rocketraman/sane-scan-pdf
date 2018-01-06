@@ -23,6 +23,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * bash
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
+* pdfunite
 
 ### Optional
 
