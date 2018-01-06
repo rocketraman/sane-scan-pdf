@@ -16,6 +16,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Specify resolution
 * Truncate n pages from end of scan e.g. duplex scanning with last page truncated
 * Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
+* Performance: scanner run in parallel with page post-processing
 
 ## Requirements
 
