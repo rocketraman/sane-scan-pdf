@@ -58,6 +58,8 @@ OPTIONS
    Custom Page Height in mm
  -pw, --page-width
    Custom Page Width in mm
+ -x, --device
+   Override scanner device name, defaulting to `fujitsu`
  --crop
    Crop to contents (driver must support this)
  --deskew
