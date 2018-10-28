@@ -62,6 +62,8 @@ while [ $# -gt 0 ]; do
 
   -l|--outputlist) shift; USEARRAY=1; OUTPUT=(); OUTPUT+=("$1") ;;
 
+  -x|--device) shift; DEVICE=$1;;
+
   *) if [ $USEARRAY = 1 ]; then OUTPUT+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
@@ -186,7 +188,7 @@ fi;
 
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
-eval scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
+eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 
 shopt -s extglob nullglob
 pdffiles=(scan-[0-9]*.pdf)
