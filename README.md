@@ -24,6 +24,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
 * pdfunite
+* ImageMagick (if --skip-empty-pages) is used
 
 ### Optional
 
@@ -68,9 +69,16 @@ OPTIONS
    Run post-processing deskew and black edge detection (requires unpaper)
  --ocr
    Run OCR to make the PDF searchable (requires tesseract)
+ --skip-empty-pages
+   remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)
 
 OUTPUT
  -o, --output <outputfile>
    Output to named file default=scan.pdf
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
 ```
+
+## Contributors
+
+* [Raman Gupta](https://github.com/rocketraman/)
+* [Stefan Armbruster](https://github.com/sarmbruster/)
