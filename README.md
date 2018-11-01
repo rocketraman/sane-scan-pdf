@@ -78,7 +78,10 @@ OUTPUT
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
 ```
 
-## Contributors
+## Author
 
 * [Raman Gupta](https://github.com/rocketraman/)
+
+## Contributors
+
 * [Stefan Armbruster](https://github.com/sarmbruster/)

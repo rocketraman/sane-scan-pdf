@@ -71,7 +71,6 @@ process_page() {
     fi
     log ""
     log "-------------------------------------------------------------------------------"
-    log "Converting image data to pdf..."
     if [ $SEARCHABLE -eq 1 ]; then
       log "Converting image data to searchable pdf..."
       tesseract $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
@@ -90,7 +89,7 @@ process_page() {
       pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
     fi    
   else
-    log "skipping empty page $IMAGE_FILE"
+    log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
   fi
   
   status=$?
