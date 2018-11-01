@@ -14,7 +14,8 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Creates searchable PDFs (with tesseract)
 * Duplex (if scanner supports it)
 * Specify resolution
-* Truncate n pages from end of scan e.g. duplex scanning with last page truncated
+* Truncate n pages explicitly from end of scan e.g. duplex scanning with last page truncated
+* Skip white-only pages automatically (with ImageMagick)
 * Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
 * Performance: scanner run in parallel with page post-processing
 
