@@ -59,7 +59,7 @@ process_page() {
   log "$IMAGE_PATH has $PERCENTAGE_WHITE % white"
     
   PP_PREFIX=
-  if (( $(echo "$PERCENTAGE_WHITE < 99.99" |bc -l) )); then
+  if (( $(echo "$PERCENTAGE_WHITE < 99.8" |bc -l) )); then
     if [ $UNPAPER -eq 1 ]; then
       log "Applying unpaper post-processing to image data..."
       PP_PREFIX="unpaper-"
