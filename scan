@@ -12,6 +12,7 @@ SCRIPT="$DIR/scan_perpage"
 DUPLEX=0
 UNPAPER=0
 SEARCHABLE=0
+LANGUAGE=eng
 MAXPAGE=
 TRUNCPAGE=0
 HELP=0
@@ -23,6 +24,10 @@ PGWIDTHIN=
 CROP=0
 DESKEW=0
 VERBOSE=0
+SKIP_EMPTY_PAGES=0
+
+TMP_DIR=`mktemp -d`
+trap "rm -rf $TMP_DIR" 0
 
 # Parse command-line options
 while [ $# -gt 0 ]; do
@@ -57,6 +62,10 @@ while [ $# -gt 0 ]; do
   --unpaper) UNPAPER=1 ;;
 
   --searchable|--ocr) SEARCHABLE=1 ;;
+
+  --language) LANGUAGE=$1 ;;
+
+  --skip-empty-pages) SKIP_EMPTY_PAGES=1 ;;
 
   -o|--output) shift; OUTPUT="$1" ;;
 
@@ -94,6 +103,8 @@ if [ $HELP -eq 1 ]; then
   echo "   Custom Page Height in mm"
   echo " -pw, --page-width"
   echo "   Custom Page Width in mm"
+  echo " -x, --device"
+  echo "  Override scanner device name, defaulting to `fujitsu`"
   echo " --crop"
   echo "   Crop to contents (driver must support this)"
   echo " --deskew"
@@ -102,6 +113,10 @@ if [ $HELP -eq 1 ]; then
   echo "   Run post-processing deskew and black edge detection (requires unpaper)"
   echo " --ocr"
   echo "   Run OCR to make the PDF searchable (requires tesseract)"
+  echo " --language <lang>"
+  echo "   which language to use for OCR"
+  echo " --skip-empty-pages"
+  echo "   remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)"
   echo ""
   echo "OUTPUT"
   echo " -o, --output <outputfile>"
@@ -175,10 +190,12 @@ fi
 export VERBOSE
 export UNPAPER
 export SEARCHABLE
+export LANGUAGE
 export RESOLUTION
 export PGWIDTHIN
 export PGHEIGHTIN
 export PS2PDF_OPTS
+export SKIP_EMPTY_PAGES
 
 if [ $VERBOSE = 1 ]; then
   LOCKFILE=$(mktemp)
@@ -186,12 +203,13 @@ if [ $VERBOSE = 1 ]; then
   export LOCKFILE
 fi;
 
+
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
-eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
+eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o $TMP_DIR/scan-%04d
 
 shopt -s extglob nullglob
-pdffiles=(scan-[0-9]*.pdf)
+pdffiles=($TMP_DIR/scan-[0-9]*.pdf)
 numscans=${#pdffiles[@]}
 if [ $numscans -gt 0 ]; then
   echo "Processing $numscans pages"
@@ -213,13 +231,13 @@ if [ $numscans -gt 0 ]; then
           if [ -f "${OUTPUT[$index]}.orig" ]; then
             pdffiles+=("${OUTPUT[$index]}.orig")
           fi
-          pdffiles+=(scan-*(0)$scanno.pdf)
-          pdfunite "${pdffiles[@]}" "${OUTPUT[$index]}" && rm scan-*(0)$scanno.pdf
+          pdffiles+=($TMP_DIR/scan-*(0)$scanno.pdf)
+          pdfunite "${pdffiles[@]}" "${OUTPUT[$index]}" && rm $TMP_DIR/scan-*(0)$scanno.pdf
         else
-          mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+          mv $TMP_DIR/scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
         fi
       else
-        mv scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
+        mv $TMP_DIR/scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
       fi
       let "index = $index + 1"
     done
@@ -232,13 +250,13 @@ if [ $numscans -gt 0 ]; then
     if [ -f "${OUTPUT}.orig" ]; then
       pdffiles+=("${OUTPUT}.orig")
     fi
-    pdffiles+=(scan-[0-9]*.pdf)
-    pdfunite "${pdffiles[@]}" "$OUTPUT" && rm scan-[0-9]*.pdf
+    pdffiles+=($TMP_DIR/scan-[0-9]*.pdf)
+    pdfunite "${pdffiles[@]}" "$OUTPUT" && rm $TMP_DIR/scan-[0-9]*.pdf
   else
     if [ $USEARRAY = 1 ]; then
-      mv scan-0*.pdf "${OUTPUT[0]}"
+      mv $TMP_DIR/scan-0*.pdf "${OUTPUT[0]}"
     else
-      mv scan-0*.pdf "$OUTPUT"
+      mv $TMP_DIR/scan-0*.pdf "$OUTPUT"
     fi
   fi
   echo ""
