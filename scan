@@ -104,7 +104,7 @@ if [ $HELP -eq 1 ]; then
   echo " -pw, --page-width"
   echo "   Custom Page Width in mm"
   echo " -x, --device"
-  echo "  Override scanner device name, defaulting to `fujitsu`"
+  echo "  Override scanner device name, defaulting to \"fujitsu\""
   echo " --crop"
   echo "   Crop to contents (driver must support this)"
   echo " --deskew"
