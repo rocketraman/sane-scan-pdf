@@ -63,7 +63,7 @@ while [ $# -gt 0 ]; do
 
   --searchable|--ocr) SEARCHABLE=1 ;;
 
-  --language) LANGUAGE=$1 ;;
+  --language) shift; LANGUAGE=$1 ;;
 
   --skip-empty-pages) SKIP_EMPTY_PAGES=1 ;;
 
