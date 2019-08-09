@@ -35,6 +35,16 @@ logstdout()
   fi
 }
 
+runconstrained()
+{
+  if [ -x "$(command -v sem)" ]; then
+    # use up to 75% of the cores available
+    sem --jobs 75% --id scan_perpage --fg "$@"
+  else
+    "$@"
+  fi
+}
+
 if [ $# -lt 1 ]; then
   usage
   exit 1
@@ -66,14 +76,14 @@ process_page() {
       if [ $VERBOSE = 1 ]; then
         UNPAPERVERBOSE="-v"
       fi
-      #unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
-      unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
+      #runconstrained unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
+      runconstrained unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
     fi
     log ""
     log "-------------------------------------------------------------------------------"
     if [ $SEARCHABLE -eq 1 ]; then
       log "Converting image data to searchable pdf..."
-      tesseract $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
+      runconstrained tesseract $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
     else
       log "Converting image data to pdf..."
       PNMVERBOSE=
@@ -86,7 +96,7 @@ process_page() {
         PAGEOPTS="-imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN"
       fi
       log "Using page options: $PAGEOPTS"
-      pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
+      runconstrained pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
     fi    
   else
     log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
