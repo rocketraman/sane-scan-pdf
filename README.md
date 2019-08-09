@@ -32,6 +32,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * unpaper (for software deskew)
 * flock (usually provided by util-linux) (for properly ordered verbose logs)
 * tesseract (to make searchable PDFs)
+* sem (via gnu-parallels, to constrain CPU usage during page processing for fast scanners)
 
 ## Getting Started
 
