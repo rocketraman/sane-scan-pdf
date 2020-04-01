@@ -96,7 +96,7 @@ if [ $HELP -eq 1 ]; then
   echo " -e, --max <pages>"
   echo "   Max number of pages e.g. 2 (default is all pages)"
   echo " -t, --truncate <pages>"
-  echo "   Truncate number of pages from end e.g. 1 (default is none)"
+  echo "   Truncate number of pages from end e.g. 1 (default is none) -- truncation happens after --skip-empty-pages"
   echo " -s, --size"
   echo "   Page Size as type e.g. Letter (default), Legal, A4, no effect if --crop is specified"
   echo " -ph, --page-height"
