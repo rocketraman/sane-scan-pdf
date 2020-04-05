@@ -18,6 +18,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Skip white-only pages automatically (with ImageMagick)
 * Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
 * Performance: scanner run in parallel with page post-processing
+* Limit parallel processing for very fast scanners or constrained environments (if sem installed)
 
 ## Requirements
 
@@ -32,7 +33,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * unpaper (for software deskew)
 * flock (usually provided by util-linux) (for properly ordered verbose logs)
 * tesseract (to make searchable PDFs)
-* sem (via gnu-parallels, to constrain CPU usage during page processing for fast scanners)
+* sem (via gnu-parallels, to constrain resource usage during page processing)
 
 ## Getting Started
 
