@@ -86,14 +86,15 @@ process_page() {
       runconstrained tesseract $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
     else
       log "Converting image data to pdf..."
-      PNMVERBOSE=
-      if [ $VERBOSE = 1 ]; then
-        PNMVERBOSE="-verbose"
-      fi
       if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
         PAGEOPTS="-equalpixels -dpi=$RESOLUTION -noturn"
       else
         PAGEOPTS="-imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN"
+      fi
+      PNMVERBOSE=
+      # older versions of pnmtops (Ubuntu, Debian) don't have the -verbose option, test for it
+      if [[ $VERBOSE = 1 && ! "$(pnmtops -verbose 2>&1 < /dev/null)" =~ "unrecognized option" ]]; then
+        PNMVERBOSE="-verbose"
       fi
       log "Using page options: $PAGEOPTS"
       runconstrained pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
