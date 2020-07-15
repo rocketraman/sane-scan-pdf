@@ -16,7 +16,7 @@ LANGUAGE=eng
 MAXPAGE=
 TRUNCPAGE=0
 HELP=0
-SIZE=Letter
+SIZE=
 PGHEIGHT=
 PGHEIGHTIN=
 PGWIDTH=
@@ -156,10 +156,14 @@ fi
 
 PS2PDF_OPTS=
 
-# Specify non-letter sizes in mm
+if [[ $CROP != 1 && $SIZE == "" ]]; then
+  # Default to Letter size, but only if crop is not specified
+  SIZE=Letter
+fi
+
 case "$SIZE" in
 
-  Letter) PGHEIGHTIN=11; PGWIDTHIN=8.5 ;;
+  Letter) PGHEIGHT=279.4; PGWIDTH=215.9 ;;
 
   Legal) PGHEIGHT=355.6; PGWIDTH=215.9 ;;
 
@@ -180,11 +184,11 @@ if [ $CROP != 1 -a "$PGWIDTH" != "" ]; then
 fi
 
 if [ $CROP = 1 ]; then
-  CROP="--swcrop=yes"
-  PGHEIGHT=
-  PGWIDTH=
-  PGHEIGHTIN=
-  PGWIDTHIN=
+  CROP="--swcrop=yes --ald=yes"
+  # In duplex mode, the driver's buffer for the back side image will be larger than necessary, oh well
+  # http://sane.10972.n7.nabble.com/Fujitsu-backend-and-iX500-scanning-page-longer-than-14-Inches-td19303.html
+  PGHEIGHT="--page-height 9999 -y 9999"
+  PGWIDTH="--page-width 9999 -x 9999"
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
