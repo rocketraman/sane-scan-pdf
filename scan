@@ -131,6 +131,11 @@ if [ $USEARRAY = 0 -a -f "$OUTPUT" -a ! $APPEND = 1 ]; then
   exit 1
 fi
 
+if [ "$OUTPUT" = "" ]; then
+  echo >&2 "Output file must be specified. Aborting."
+  exit 1
+fi
+
 if [ $USEARRAY = 1 -a ! $APPEND = 1 ]; then
   for o in "${OUTPUT[@]}"; do
     if [ -f "$o" ]; then
