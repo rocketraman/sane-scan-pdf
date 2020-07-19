@@ -23,6 +23,7 @@ PGWIDTH=
 PGWIDTHIN=
 CROP=0
 DESKEW=0
+DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
 
@@ -73,6 +74,8 @@ while [ $# -gt 0 ]; do
 
   -x|--device) shift; DEVICE=$1;;
 
+  -xo|--driver-options) shift; DRIVER_OPTION=$1;;
+
   *) if [ $USEARRAY = 1 ]; then OUTPUT+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
@@ -105,6 +108,9 @@ if [ $HELP -eq 1 ]; then
   echo "   Custom Page Width in mm"
   echo " -x, --device"
   echo "  Override scanner device name, defaulting to \"fujitsu\""
+  echo " -xo, --driver-options"
+  echo "  Send additional options to the scanner driver e.g."
+  echo "  -xo \"--whatever bar --frobnitz baz\""
   echo " --crop"
   echo "   Crop to contents (driver must support this)"
   echo " --deskew"
@@ -211,7 +217,7 @@ fi;
 
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
-eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o $TMP_DIR/scan-%04d
+eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE -o $TMP_DIR/scan-%04d
 
 shopt -s extglob nullglob
 pdffiles=($TMP_DIR/scan-[0-9]*.pdf)
