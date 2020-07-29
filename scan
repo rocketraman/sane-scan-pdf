@@ -26,7 +26,7 @@ DESKEW=0
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
 
-TMP_DIR=`mktemp -d`
+TMP_DIR=$(mktemp -d)
 trap "rm -rf $TMP_DIR" 0
 
 # Parse command-line options
