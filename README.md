@@ -26,7 +26,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
 * pdfunite
-* ImageMagick (if --skip-empty-pages) is used
+* ImageMagick (if --skip-empty-pages or --ocr is used)
 
 ### Optional
 
@@ -71,7 +71,7 @@ OPTIONS
  --unpaper
    Run post-processing deskew and black edge detection (requires unpaper)
  --ocr
-   Run OCR to make the PDF searchable (requires tesseract)
+   Run OCR to make the PDF searchable (requires tesseract and ImageMagick)
  --skip-empty-pages
    remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)
 

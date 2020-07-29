@@ -87,7 +87,9 @@ process_page() {
     log "-------------------------------------------------------------------------------"
     if [ $SEARCHABLE -eq 1 ]; then
       log "Converting image data to searchable pdf..."
-      runconstrained tesseract $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
+      # tesseract uses the input's DPI header, we need to convert to a format that supports this (like tiff)
+      convert -density ${RESOLUTION}x${RESOLUTION} -units PixelsPerInch $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff
+      runconstrained tesseract $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
     else
       log "Converting image data to pdf..."
       if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
