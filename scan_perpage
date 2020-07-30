@@ -63,7 +63,7 @@ process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
   log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE..."
-
+  log "-------------------------------------------------------------------------------"
 
   if [[ $SKIP_EMPTY_PAGES -eq 1 ]]; then
     PERCENTAGE_WHITE=$(convert "$IMAGE_PATH" -fuzz 0% -negate -threshold 0 -negate -format "%[fx:100*mean]" info:) || PERCENTAGE_WHITE=0
@@ -83,8 +83,6 @@ process_page() {
       #runconstrained unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
       runconstrained unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
     fi
-    log ""
-    log "-------------------------------------------------------------------------------"
     if [ $SEARCHABLE -eq 1 ]; then
       log "Converting image data to searchable pdf..."
       # tesseract uses the input's DPI header, we need to convert to a format that supports this (like tiff)
@@ -116,7 +114,7 @@ process_page() {
   [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE} ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}
 
   log ""
-  log "Scan processing done, status = $status"
+  log "Scan page processing done, status = $status"
 }
 
 if [ $VERBOSE = 1 ]; then
