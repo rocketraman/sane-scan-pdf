@@ -4,6 +4,8 @@ DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 DEVICE=fujitsu
 OUTPUT=scan.pdf
+OUTPUTARR=()
+USEOUTPUT=0
 USEARRAY=0
 APPEND=0
 RESOLUTION=300
@@ -35,7 +37,7 @@ cleanup()
 trap cleanup EXIT
 
 # Parse command-line options
-while [ $# -gt 0 ]; do
+while [[ $# > 0 ]]; do
   case "$1" in
 
   -v|--verbose) VERBOSE=1 ;;
@@ -72,21 +74,21 @@ while [ $# -gt 0 ]; do
 
   --skip-empty-pages) SKIP_EMPTY_PAGES=1 ;;
 
-  -o|--output) shift; OUTPUT="$1" ;;
+  -o|--output) shift; USEOUTPUT=1; OUTPUT="$1" ;;
 
-  -l|--outputlist) shift; USEARRAY=1; OUTPUT=(); OUTPUT+=("$1") ;;
+  -l|--outputlist) shift; USEARRAY=1; OUTPUTARR=(); OUTPUTARR+=("$1") ;;
 
   -x|--device) shift; DEVICE=$1;;
 
   -xo|--driver-options) shift; DRIVER_OPTION=$1;;
 
-  *) if [ $USEARRAY = 1 ]; then OUTPUT+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
+  *) if [[ $USEARRAY == 1 ]]; then OUTPUTARR+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
   shift   # next option
 done
 
-if [ $HELP -eq 1 ]; then
+if [[ $HELP == 1 ]]; then
   echo "$(basename $0) [OPTIONS]... [OUTPUT]"
   echo ""
   echo "OPTIONS"
@@ -136,31 +138,45 @@ if [ $HELP -eq 1 ]; then
   exit 0
 fi
 
-if [ $USEARRAY = 0 -a -f "$OUTPUT" -a ! $APPEND = 1 ]; then
-  echo >&2 "Output file $OUTPUT already exists. Delete or specify -a. Aborting."
+if [[ $USEARRAY == 1 && $USEOUTPUT == 1 ]]; then
+  echo >&2 "Use one of -o or -l. Aborting."
   exit 1
 fi
 
-if [ "$OUTPUT" = "" ]; then
+if [[ $USEOUTPUT == 1 && "$OUTPUT" == "" ]]; then
   echo >&2 "Output file must be specified. Aborting."
   exit 1
 fi
 
-if [ $USEARRAY = 1 -a ! $APPEND = 1 ]; then
-  for o in "${OUTPUT[@]}"; do
-    if [ -f "$o" ]; then
+if [[ $USEOUTPUT == 1 && -f "$OUTPUT" && $APPEND != 1 ]]; then
+  echo >&2 "Output file $OUTPUT already exists. Delete or specify -a. Aborting."
+  exit 1
+fi
+
+if [[ $USEARRAY == 1 && ${#OUTPUTARR[@]} == 0 ]]; then
+  echo >&2 "At least one file must be specified with -l. Aborting."
+  exit 1
+fi
+
+if [[ $USEARRAY == 1 && $APPEND != 1 ]]; then
+  for o in "${OUTPUTARR[@]}"; do
+    if [[ -f "$o" ]]; then
       echo >&2 "Output file $o already exists. Delete or specify -a. Aborting."
       exit 1
     fi
   done
 fi
 
+if [[ $USEARRAY == 1 ]]; then
+  OUTPUT=("${OUTPUTARR[@]}")
+fi
+
 SOURCE=""
-if [ $DUPLEX -eq 1 ]; then
+if [[ $DUPLEX == 1 ]]; then
   SOURCE="--source \"ADF Duplex\""
 fi
 
-if [ "$MAXPAGE" != "" ]; then
+if [[ "$MAXPAGE" != "" ]]; then
   MAXPAGE="-e $MAXPAGE"
 fi
 
@@ -181,19 +197,19 @@ case "$SIZE" in
 
 esac
 
-if [ $CROP != 1 -a "$PGHEIGHT" != "" ]; then
+if [[ $CROP != 1 && "$PGHEIGHT" != "" ]]; then
   PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
   PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
-if [ $CROP != 1 -a "$PGWIDTH" != "" ]; then
+if [[ $CROP != 1 && "$PGWIDTH" != "" ]]; then
   PGWIDTHIN=$(units --compact -1 "$PGWIDTH mm" 'in')
   PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
-if [ $CROP = 1 ]; then
+if [[ $CROP == 1 ]]; then
   CROP="--swcrop=yes --ald=yes"
   # In duplex mode, the driver's buffer for the back side image will be larger than necessary, oh well
   # http://sane.10972.n7.nabble.com/Fujitsu-backend-and-iX500-scanning-page-longer-than-14-Inches-td19303.html
@@ -202,7 +218,7 @@ if [ $CROP = 1 ]; then
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
-if [ $DESKEW = 1 ]; then
+if [[ $DESKEW == 1 ]]; then
   DESKEW="--swdeskew=yes"
 fi
 
@@ -216,7 +232,7 @@ export PGHEIGHTIN
 export PS2PDF_OPTS
 export SKIP_EMPTY_PAGES
 
-if [ $VERBOSE = 1 ]; then
+if [[ $VERBOSE == 1 ]]; then
   LOCKFILE=$(mktemp)
   trap "cleanup; rm -rf $LOCKFILE" EXIT
   export LOCKFILE
@@ -229,24 +245,24 @@ eval scanadf -d "$DEVICE" $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait -
 shopt -s extglob nullglob
 pdffiles=($TMP_DIR/scan-[0-9]*.pdf)
 numscans=${#pdffiles[@]}
-if [ $numscans -gt 0 ]; then
+if [[ $numscans > 0 ]]; then
   echo "Processing $numscans pages"
-  if [ $numscans -gt $TRUNCPAGE -a $TRUNCPAGE -gt 0 ]; then
+  if [[ $numscans > $TRUNCPAGE && $TRUNCPAGE > 0 ]]; then
     for x in ${pdffiles[@]:$numscans-$TRUNCPAGE:$TRUNCPAGE}; do rm "$x"; done;
     pdffiles=(${pdffiles[@]:0:$numscans-$TRUNCPAGE})
     echo "Truncated $TRUNCPAGE pages"
   fi
-  if [ $numscans -gt 1 -a $USEARRAY = 1 ]; then
+  if [[ $numscans > 1 && $USEARRAY == 1 ]]; then
     echo "Naming pdfs based on output list..."
     output_count=${#OUTPUT[@]}
     index=0
-    while [ "$index" -lt "$output_count" ]; do
+    while [[ "$index" < "$output_count" ]]; do
       let "scanno = $index + 1"
-      if [ -f "${OUTPUT[$index]}" ]; then
+      if [[ -f "${OUTPUT[$index]}" ]]; then
         mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
-        if [ $APPEND -eq 1 ]; then
+        if [[ $APPEND == 1 ]]; then
           pdffiles=()
-          if [ -f "${OUTPUT[$index]}.orig" ]; then
+          if [[ -f "${OUTPUT[$index]}.orig" ]]; then
             pdffiles+=("${OUTPUT[$index]}.orig")
           fi
           pdffiles+=($TMP_DIR/scan-*(0)$scanno.pdf)
@@ -259,19 +275,19 @@ if [ $numscans -gt 0 ]; then
       fi
       let "index = $index + 1"
     done
-  elif [ $numscans -gt 1 -o $APPEND -eq 1 ]; then
+  elif [[ $numscans > 1 || $APPEND == 1 ]]; then
     echo "Concatenating pdfs..."
-    if [ -f "$OUTPUT" ]; then
+    if [[ -f "$OUTPUT" ]]; then
       mv "$OUTPUT" "${OUTPUT}.orig"
     fi
     pdffiles=()
-    if [ -f "${OUTPUT}.orig" ]; then
+    if [[ -f "${OUTPUT}.orig" ]]; then
       pdffiles+=("${OUTPUT}.orig")
     fi
     pdffiles+=($TMP_DIR/scan-[0-9]*.pdf)
     pdfunite "${pdffiles[@]}" "$OUTPUT" && rm $TMP_DIR/scan-[0-9]*.pdf
   else
-    if [ $USEARRAY = 1 ]; then
+    if [[ $USEARRAY == 1 ]]; then
       mv $TMP_DIR/scan-0*.pdf "${OUTPUT[0]}"
     else
       mv $TMP_DIR/scan-0*.pdf "$OUTPUT"

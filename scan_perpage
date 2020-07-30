@@ -21,14 +21,14 @@ usage()
 
 log()
 {
-  if [ $VERBOSE = 1 ]; then
+  if [[ $VERBOSE == 1 ]]; then
     echo "scan_perpage: $1"
   fi
 }
 
 logstdout()
 {
-  if [ $VERBOSE = 1 ]; then
+  if [[ $VERBOSE == 1 ]]; then
     cat
   else
     cat > /dev/null
@@ -37,7 +37,7 @@ logstdout()
 
 runconstrained()
 {
-  if [ -x "$(command -v sem)" ]; then
+  if [[ -x "$(command -v sem)" ]]; then
     # use up to 75% of the cores available
     sem --jobs 75% --id scan_perpage --fg "$@"
   else
@@ -45,12 +45,12 @@ runconstrained()
   fi
 }
 
-if [ $# -lt 1 ]; then
+if [[ $# < 1 ]]; then
   usage
   exit 1
 fi
 
-if [ "$UNPAPER" == "" -o "$SEARCHABLE" == "" -o "$RESOLUTION" == "" -o "$RESOLUTION" == "" -o "$SKIP_EMPTY_PAGES" == "" ]; then
+if [[ "$UNPAPER" == "" || "$SEARCHABLE" == "" || "$RESOLUTION" == "" || "$RESOLUTION" == "" || "$SKIP_EMPTY_PAGES" == "" ]]; then
   usage
   exit 1
 fi
@@ -74,16 +74,16 @@ process_page() {
 
   PP_PREFIX=
   if (( $(echo "$PERCENTAGE_WHITE < 99.8" | bc -l) )); then
-    if [ $UNPAPER -eq 1 ]; then
+    if [[ $UNPAPER == 1 ]]; then
       log "Applying unpaper post-processing to image data..."
       PP_PREFIX="unpaper-"
-      if [ $VERBOSE = 1 ]; then
+      if [[ $VERBOSE == 1 ]]; then
         UNPAPERVERBOSE="-v"
       fi
       #runconstrained unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
       runconstrained unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
     fi
-    if [ $SEARCHABLE -eq 1 ]; then
+    if [[ $SEARCHABLE == 1 ]]; then
       log "Converting image data to searchable pdf..."
       # tesseract uses the input's DPI header, we need to convert to a format that supports this (like tiff)
       runconstrained convert -density ${RESOLUTION}x${RESOLUTION} -units PixelsPerInch $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff | logstdout
@@ -91,7 +91,7 @@ process_page() {
       [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff
     else
       log "Converting image data to pdf..."
-      if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
+      if [[ "$PGWIDTHIN" == "" || "$PGHEIGHTIN" == "" ]]; then
         PAGEOPTS="-equalpixels -dpi=$RESOLUTION -noturn"
       else
         PAGEOPTS="-imagewidth $PGWIDTHIN -imageheight $PGHEIGHTIN"
@@ -117,7 +117,7 @@ process_page() {
   log "Scan page processing done, status = $status"
 }
 
-if [ $VERBOSE = 1 ]; then
+if [[ $VERBOSE == 1 ]]; then
   (
     flock 200
     process_page
