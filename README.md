@@ -88,3 +88,7 @@ OUTPUT
 ## Contributors
 
 * [Stefan Armbruster](https://github.com/sarmbruster/)
+
+## Other Useful Software
+
+* [OCRmyPDF](https://github.com/jbarlow83/OCRmyPDF) - forgot to use the `--ocr` option at scanning time? use this
