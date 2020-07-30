@@ -27,8 +27,12 @@ DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
 
-TMP_DIR=$(mktemp -d)
-trap "rm -rf $TMP_DIR" 0
+TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
+cleanup()
+{
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
 
 # Parse command-line options
 while [ $# -gt 0 ]; do
@@ -214,10 +218,9 @@ export SKIP_EMPTY_PAGES
 
 if [ $VERBOSE = 1 ]; then
   LOCKFILE=$(mktemp)
-  trap "rm -rf $LOCKFILE" 0
+  trap "cleanup; rm -rf $LOCKFILE" EXIT
   export LOCKFILE
 fi;
-
 
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
