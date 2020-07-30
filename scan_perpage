@@ -90,6 +90,7 @@ process_page() {
       # tesseract uses the input's DPI header, we need to convert to a format that supports this (like tiff)
       runconstrained convert -density ${RESOLUTION}x${RESOLUTION} -units PixelsPerInch $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff | logstdout
       runconstrained tesseract $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
+      [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff
     else
       log "Converting image data to pdf..."
       if [ "$PGWIDTHIN" == "" -o "$PGHEIGHTIN" == "" ]; then
@@ -104,6 +105,7 @@ process_page() {
       fi
       log "Using page options: $PAGEOPTS"
       runconstrained pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
+      [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps
     fi    
   else
     log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
@@ -111,9 +113,7 @@ process_page() {
 
   status=$?
   rm $IMAGE_PATH
-  if [ -f $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE ]; then
-    rm $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE
-  fi
+  [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE} ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}
 
   log ""
   log "Scan processing done, status = $status"
