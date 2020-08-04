@@ -22,10 +22,13 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 
 ## Requirements
 
+The following dependencies are requirements of the script. See also [Dependencies
+Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Installation).
+
 * bash
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
-* pdfunite
+* pdfunite (poppler-utils)
 * ImageMagick (if --skip-empty-pages or --ocr is used)
 
 ### Optional
