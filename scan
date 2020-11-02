@@ -19,6 +19,7 @@ MAXPAGE=
 TRUNCPAGE=0
 HELP=0
 SIZE=
+DEFAULTSIZE=1
 PGHEIGHT=
 PGHEIGHTIN=
 PGWIDTH=
@@ -61,6 +62,8 @@ while [[ $# > 0 ]]; do
   -ph|--page-height) shift; PGHEIGHT=$1 ;;
 
   -pw|--page-width) shift; PGWIDTH=$1 ;;
+
+  --no-default-size) DEFAULTSIZE=0 ;;
 
   --crop) CROP=1 ;;
 
@@ -117,6 +120,8 @@ if [[ $HELP == 1 ]]; then
   echo " -xo, --driver-options"
   echo "  Send additional options to the scanner driver e.g."
   echo "  -xo \"--whatever bar --frobnitz baz\""
+  echo " --no-default-size"
+  echo "   Disable default page size, useful if driver does not support page size/location arguments"
   echo " --crop"
   echo "   Crop to contents (driver must support this)"
   echo " --deskew"
@@ -182,8 +187,8 @@ fi
 
 PS2PDF_OPTS=
 
-if [[ $CROP != 1 && $SIZE == "" ]]; then
-  # Default to Letter size, but only if crop is not specified
+if [[ $CROP != 1 && $SIZE == "" && $DEFAULTSIZE == 1 ]]; then
+  # Default to Letter size, but only if crop is not specified and this feature is not disabled
   SIZE=Letter
 fi
 
