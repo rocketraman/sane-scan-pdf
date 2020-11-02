@@ -29,6 +29,7 @@ Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Ins
 * pnmtops (netpbm-progs)
 * ps2pdf (ghostscript)
 * pdfunite (poppler-utils)
+* units (units)
 * ImageMagick (if --skip-empty-pages or --ocr is used)
 
 ### Optional
