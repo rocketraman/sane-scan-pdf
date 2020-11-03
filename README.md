@@ -38,6 +38,7 @@ Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Ins
 * flock (usually provided by util-linux) (for properly ordered verbose logs)
 * tesseract (to make searchable PDFs)
 * sem (via gnu-parallels, to constrain resource usage during page processing)
+* bc (for whitepage detection percentage calculations)
 
 ## Getting Started
 
