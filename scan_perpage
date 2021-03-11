@@ -59,6 +59,11 @@ IMAGE_PATH=$1
 IMAGE_DIR=$(dirname $1)
 IMAGE_FILE=$(basename $1)
 
+TIMEVERBOSE=
+if [[ $VERBOSE == 1 ]]; then
+  TIMEVERBOSE=time
+fi
+
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
@@ -80,14 +85,16 @@ process_page() {
       if [[ $VERBOSE == 1 ]]; then
         UNPAPERVERBOSE="-v"
       fi
-      #runconstrained unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
-      runconstrained unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
+      #runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
+      runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
     fi
     if [[ $SEARCHABLE == 1 ]]; then
       log "Converting image data to searchable pdf..."
       # tesseract uses the input's DPI header, we need to convert to a format that supports this (like tiff)
-      runconstrained convert -density ${RESOLUTION}x${RESOLUTION} -units PixelsPerInch $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff | logstdout
-      runconstrained tesseract $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
+      log "...Running convert"
+      runconstrained $TIMEVERBOSE convert -density ${RESOLUTION}x${RESOLUTION} -units PixelsPerInch $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff | logstdout
+      log "...Running tesseract"
+      runconstrained $TIMEVERBOSE tesseract $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff $IMAGE_DIR/${IMAGE_FILE%.*} -l $LANGUAGE pdf | logstdout
       [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.tiff
     else
       log "Converting image data to pdf..."
@@ -101,9 +108,11 @@ process_page() {
       if [[ $VERBOSE = 1 && ! "$(pnmtops -verbose 2>&1 < /dev/null)" =~ "unrecognized option" ]]; then
         PNMVERBOSE="-verbose"
       fi
-      log "Using page options: $PAGEOPTS"
-      runconstrained pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | ps2pdf $PS2PDF_OPTS - > $IMAGE_DIR/${IMAGE_FILE%.*}.pdf | logstdout
-      [[ -f $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps
+      log "...Running pnmtops on $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE using page options: $PAGEOPTS"
+      runconstrained $TIMEVERBOSE pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE > $IMAGE_DIR/${IMAGE_FILE}.ps | logstdout
+      log "...Running ps2pdf on $IMAGE_DIR/${IMAGE_FILE}.ps"
+      runconstrained $TIMEVERBOSE ps2pdf $PS2PDF_OPTS $IMAGE_DIR/${IMAGE_FILE}.ps $IMAGE_DIR/${IMAGE_FILE}.pdf | logstdout
+      [[ -f $IMAGE_DIR/${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps
     fi    
   else
     log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
