@@ -155,8 +155,12 @@ if [[ $USEARRAY == 1 && $USEOUTPUT == 1 ]]; then
 fi
 
 if [[ $MODE_CHANGED == 1 && $MODE_HW_DEFAULT == 1 ]]; then
-  echo >&2 "Use one of --mode or --mode-hardware-default. Aborting."
+  echo >&2 "Use one of -m/--mode or --mode-hardware-default. Aborting."
   exit 1
+fi
+
+if [[ $MODE_CHANGED == 0 && $MODE_HW_DEFAULT == 0 ]]; then
+  echo >&2 'Warning: neither the -m/--mode nor --mode-hw-default argument was specified. The current default is "Lineart", however -m/--mode is a SANE device-specific switch. Therefore, in a future version when --mode is not specified, `'"`basename "$0"`""'"' will defer to the device-specific default. If you wish to continue using "Lineart" as your scan mode, either verify that is the default for your scanner (scanadf --help -d <device>), or specify --mode Lineart explicitly on the command line.'
 fi
 
 if [[ $USEOUTPUT == 1 && "$OUTPUT" == "" ]]; then
