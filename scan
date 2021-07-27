@@ -10,6 +10,8 @@ USEARRAY=0
 APPEND=0
 RESOLUTION=300
 MODE=Lineart
+MODE_CHANGED=0
+MODE_HW_DEFAULT=0
 SCRIPT="$DIR/scan_perpage"
 DUPLEX=0
 UNPAPER=0
@@ -45,7 +47,9 @@ while [[ $# > 0 ]]; do
 
   -d|--duplex) DUPLEX=1 ;;
 
-  -m|--mode) shift; MODE=$1 ;;
+  -m|--mode) shift; MODE=$1; MODE_CHANGED=1 ;;
+
+  --mode-hw-default) shift; MODE_HW_DEFAULT=1 ;;
 
   -r|--resolution) shift; RESOLUTION=$1 ;;
 
@@ -100,7 +104,9 @@ if [[ $HELP == 1 ]]; then
   echo " -d, --duplex"
   echo "   Duplex scanning"
   echo " -m, --mode"
-  echo "   Mode e.g. Lineart (default), Halftone, Gray, Color, etc."
+  echo "   Mode e.g. Lineart (default), Halftone, Gray, Color, etc. Use --mode-hw-default to not set any mode"
+  echo " --mode-hw-default"
+  echo "   Do not set the mode explicitly, use the hardware default"
   echo " -r, --resolution"
   echo "   Resolution e.g 300 (default)"
   echo " -a, --append"
@@ -145,6 +151,11 @@ fi
 
 if [[ $USEARRAY == 1 && $USEOUTPUT == 1 ]]; then
   echo >&2 "Use one of -o or -l. Aborting."
+  exit 1
+fi
+
+if [[ $MODE_CHANGED == 1 && $MODE_HW_DEFAULT == 1 ]]; then
+  echo >&2 "Use one of --mode or --mode-hardware-default. Aborting."
   exit 1
 fi
 
@@ -245,8 +256,10 @@ fi;
 
 echo >&2 "Scanning..."
 #eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
-if test -n "$MODE"; then
-  mode="--mode $MODE"
+if [[ $MODE_HW_DEFAULT == 1 ]]; then
+  MODE=
+else
+  MODE="--mode $MODE"
 fi
 eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE -o $TMP_DIR/scan-%04d
 
