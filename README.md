@@ -52,7 +52,9 @@ OPTIONS
  -d, --duplex
    Duplex scanning
  -m, --mode
-   Mode e.g. Lineart (default), Halftone, Gray, Color, etc.
+   Mode e.g. Lineart (default), Halftone, Gray, Color, etc. Use --mode-hw-default to not set any mode
+ --mode-hw-default
+   Do not set the mode explicitly, use the hardware default
  -r, --resolution
    Resolution e.g 300 (default)
  -a, --append
