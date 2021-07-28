@@ -263,7 +263,7 @@ echo >&2 "Scanning..."
 if [[ $MODE_HW_DEFAULT == 1 ]]; then
   MODE=
 else
-  MODE="--mode $MODE"
+  MODE="--mode '$MODE'"
 fi
 eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE -o $TMP_DIR/scan-%04d
 
