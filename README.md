@@ -88,6 +88,21 @@ OUTPUT
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
 ```
 
+### Helpful Commands
+
+List available scanner devices (for `-x/--device` argument):
+
+```
+scanadf -L
+```
+
+List available device-specific options, including acceptable values for
+`-m/--mode` and `-r/--resolution`:
+
+```
+scanadf [-d <device>] --help
+```
+
 ## Author
 
 * [Raman Gupta](https://github.com/rocketraman/)
