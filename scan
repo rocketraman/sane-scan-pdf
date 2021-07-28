@@ -49,7 +49,7 @@ while [[ $# > 0 ]]; do
 
   -m|--mode) shift; MODE=$1; MODE_CHANGED=1 ;;
 
-  --mode-hw-default) shift; MODE_HW_DEFAULT=1 ;;
+  --mode-hw-default) MODE_HW_DEFAULT=1 ;;
 
   -r|--resolution) shift; RESOLUTION=$1 ;;
 
