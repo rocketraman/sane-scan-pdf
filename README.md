@@ -88,6 +88,20 @@ OUTPUT
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
 ```
 
+### Tips
+
+The default scanner device is set to `fujitsu`. If you have another scanner,
+you will need to use the `-x`/`--device` argument to specify your scanner.
+See below for how to get the list of available devices.
+
+The scanners and scanner drivers vary in features they support. This script
+provides several options to the underlying scanner driver by default, and
+these options may not be supported by your scanner/scanner driver. If
+you are receiving an error about `--page-width`/`--page-height` being
+unrecognized options, try the `--no-default-size` option. If you receive an
+error about the `--mode` value being invalid, try `--mode-hw-default`
+and see below for how to retrieve the list of modes that your system understands.
+
 ### Helpful Commands
 
 List available scanner devices (for `-x`/`--device` argument):
