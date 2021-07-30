@@ -265,7 +265,13 @@ if [[ $MODE_HW_DEFAULT == 1 ]]; then
 else
   MODE="--mode '$MODE'"
 fi
-eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE -o $TMP_DIR/scan-%04d
+if [[ $DESKEW == 0 ]]; then
+  DESKEW=
+fi
+if [[ $CROP == 0 ]]; then
+  CROP=
+fi
+eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION -o $TMP_DIR/scan-%04d $DESKEW $CROP $SOURCE $MODE $DRIVER_OPTION
 
 shopt -s extglob nullglob
 pdffiles=($TMP_DIR/scan-[0-9]*.pdf)
