@@ -90,14 +90,14 @@ OUTPUT
 
 ### Helpful Commands
 
-List available scanner devices (for `-x/--device` argument):
+List available scanner devices (for `-x`/`--device` argument):
 
 ```
 scanadf -L
 ```
 
 List available device-specific options, including acceptable values for
-`-m/--mode` and `-r/--resolution`:
+`-m`/`--mode` and `-r`/`--resolution`:
 
 ```
 scanadf [-d <device>] --help
