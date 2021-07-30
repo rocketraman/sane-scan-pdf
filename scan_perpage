@@ -67,10 +67,10 @@ fi
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE..."
+  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES..."
   log "-------------------------------------------------------------------------------"
 
-  if [[ $SKIP_EMPTY_PAGES -eq 1 ]]; then
+  if [[ $SKIP_EMPTY_PAGES == 1 ]]; then
     PERCENTAGE_WHITE=$(convert "$IMAGE_PATH" -fuzz 0% -negate -threshold 0 -negate -format "%[fx:100*mean]" info:) || PERCENTAGE_WHITE=0
     log "$IMAGE_PATH has $PERCENTAGE_WHITE % white"
   else
@@ -78,7 +78,9 @@ process_page() {
   fi
 
   PP_PREFIX=
-  if (( $(echo "$PERCENTAGE_WHITE < 99.8" | bc -l) )); then
+  if [[ $SKIP_EMPTY_PAGES == 1 && $(echo "$PERCENTAGE_WHITE > 99.8" | bc -l) == 1 ]]; then
+    log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
+  else
     if [[ $UNPAPER == 1 ]]; then
       log "Applying unpaper post-processing to image data..."
       PP_PREFIX="unpaper-"
@@ -105,7 +107,7 @@ process_page() {
       fi
       PNMVERBOSE=
       # older versions of pnmtops (Ubuntu, Debian) don't have the -verbose option, test for it
-      if [[ $VERBOSE = 1 && ! "$(pnmtops -verbose 2>&1 < /dev/null)" =~ "unrecognized option" ]]; then
+      if [[ $VERBOSE == 1 && ! "$(pnmtops -verbose 2>&1 < /dev/null)" =~ "unrecognized option" ]]; then
         PNMVERBOSE="-verbose"
       fi
       log "...Running pnmtops on $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE using page options: $PAGEOPTS"
@@ -114,8 +116,6 @@ process_page() {
       runconstrained $TIMEVERBOSE ps2pdf $PS2PDF_OPTS $IMAGE_DIR/${IMAGE_FILE}.ps $IMAGE_DIR/${IMAGE_FILE}.pdf | logstdout
       [[ -f $IMAGE_DIR/${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps
     fi    
-  else
-    log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
   fi
 
   status=$?

@@ -242,6 +242,11 @@ if [[ $DESKEW == 1 ]]; then
   DESKEW="--swdeskew=yes"
 fi
 
+if [[ $SKIP_EMPTY_PAGES == 1 && ! -x "$(command -v bc)" ]]; then
+  echo >&2 'Warning: `--skip-empty-pages` specified, but `bc` not available. Disabling empty page detection.'
+  SKIP_EMPTY_PAGES=0
+fi
+
 export VERBOSE
 export UNPAPER
 export SEARCHABLE
