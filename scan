@@ -283,10 +283,10 @@ if [[ $numscans > 0 ]]; then
     echo "Truncated $TRUNCPAGE pages"
   fi
   if [[ $numscans > 1 && $USEARRAY == 1 ]]; then
-    echo "Naming pdfs based on output list..."
     output_count=${#OUTPUT[@]}
+    echo "Naming $numscans pdfs based on output list of $output_count names..."
     index=0
-    while [[ "$index" < "$output_count" ]]; do
+    while (( $index < $output_count && $numscans > $index )); do
       let "scanno = $index + 1"
       if [[ -f "${OUTPUT[$index]}" ]]; then
         mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
