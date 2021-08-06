@@ -271,23 +271,34 @@ else
   MODE="--mode '$MODE'"
 fi
 eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE -o $TMP_DIR/scan-%04d
+# Simulate empty page scanner outputs for debugging
+#convert xc:none -page Letter $TMP_DIR/scan-0001.pdf
 
 shopt -s extglob nullglob
 pdffiles=($TMP_DIR/scan-[0-9]*.pdf)
 numscans=${#pdffiles[@]}
-if [[ $numscans > 0 ]]; then
+if (( numscans > 0 )); then
   echo "Processing $numscans pages"
-  if [[ $numscans > $TRUNCPAGE && $TRUNCPAGE > 0 ]]; then
-    for x in ${pdffiles[@]:$numscans-$TRUNCPAGE:$TRUNCPAGE}; do rm "$x"; done;
-    pdffiles=(${pdffiles[@]:0:$numscans-$TRUNCPAGE})
-    echo "Truncated $TRUNCPAGE pages"
+  if (( TRUNCPAGE > 0 )); then
+    truncpage=$TRUNCPAGE
+    if (( numscans < TRUNCPAGE )); then
+      truncpage=$numscans
+    fi
+    for x in ${pdffiles[@]:$numscans-$truncpage:$truncpage}; do rm "$x"; done;
+    pdffiles=(${pdffiles[@]:0:$numscans-$truncpage})
+    echo "Truncated $truncpage pages"
+    let "numscans = numscans - truncpage"
   fi
-  if [[ $numscans > 1 && $USEARRAY == 1 ]]; then
-    echo "Naming pdfs based on output list..."
+  if (( numscans <= 0 )); then
+    echo "Found no scans."
+    exit 0
+  fi
+  if (( numscans > 1 && USEARRAY == 1 )); then
     output_count=${#OUTPUT[@]}
+    echo "Naming $numscans pdfs based on output list of $output_count names..."
     index=0
-    while [[ "$index" < "$output_count" ]]; do
-      let "scanno = $index + 1"
+    while (( index < output_count && numscans > index )); do
+      let "scanno = index + 1"
       if [[ -f "${OUTPUT[$index]}" ]]; then
         mv "${OUTPUT[$index]}" "${OUTPUT[$index]}.orig"
         if [[ $APPEND == 1 ]]; then
@@ -303,9 +314,9 @@ if [[ $numscans > 0 ]]; then
       else
         mv $TMP_DIR/scan-*(0)$scanno.pdf "${OUTPUT[$index]}"
       fi
-      let "index = $index + 1"
+      let "index = index + 1"
     done
-  elif [[ $numscans > 1 || $APPEND == 1 ]]; then
+  elif (( numscans > 1 || APPEND == 1 )); then
     echo "Concatenating pdfs..."
     if [[ -f "$OUTPUT" ]]; then
       mv "$OUTPUT" "${OUTPUT}.orig"
