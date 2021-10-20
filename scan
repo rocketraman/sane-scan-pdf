@@ -31,6 +31,7 @@ DESKEW=0
 DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
+SOURCE=""
 
 TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
 cleanup()
@@ -38,6 +39,8 @@ cleanup()
   rm -rf "$TMP_DIR"
 }
 trap cleanup EXIT
+
+[ -e "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults" ] && . "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults"
 
 # Parse command-line options
 while [[ $# > 0 ]]; do
@@ -191,7 +194,6 @@ if [[ $USEARRAY == 1 ]]; then
   OUTPUT=("${OUTPUTARR[@]}")
 fi
 
-SOURCE=""
 if [[ $DUPLEX == 1 ]]; then
   SOURCE="--source \"ADF Duplex\""
 fi
