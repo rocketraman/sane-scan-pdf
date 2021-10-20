@@ -125,7 +125,7 @@ if [[ $HELP == 1 ]]; then
   echo " -pw, --page-width"
   echo "   Custom Page Width in mm"
   echo " -x, --device"
-  echo "  Override scanner device name, defaulting to \"fujitsu\""
+  echo "  Override scanner device name, defaulting to \"$DEVICE\""
   echo " -xo, --driver-options"
   echo "  Send additional options to the scanner driver e.g."
   echo "  -xo \"--whatever bar --frobnitz baz\""
