@@ -272,6 +272,7 @@ if [[ $MODE_HW_DEFAULT == 1 ]]; then
 else
   MODE="--mode '$MODE'"
 fi
+[ -e "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre" ] && . "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
 eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait $MODE $DESKEW $CROP $DRIVER_OPTION $SOURCE --resolution $RESOLUTION -o $TMP_DIR/scan-%04d
 # Simulate empty page scanner outputs for debugging
 #convert xc:none -page Letter $TMP_DIR/scan-0001.pdf
