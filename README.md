@@ -88,10 +88,24 @@ OUTPUT
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
 ```
 
+### Configuration
+
+Use `--help` locally to show the location of optional configuration and
+pre-scan hook scripts. These scripts may contain environment variables to
+pre-configure `scan`. For example the contents of the `default` file may be
+something like:
+
+```
+DEVICE=something
+SEARCHABLE=1
+MODE_HW_DEFAULT=1
+```
+
 ### Tips
 
 The default scanner device is set to `fujitsu`. If you have another scanner,
-you will need to use the `-x`/`--device` argument to specify your scanner.
+you will need to use the `-x`/`--device` argument to specify your scanner,
+or save a `DEVICE=something` line to a local config file as shown above.
 See below for how to get the list of available devices.
 
 The scanners and scanner drivers vary in features they support. This script

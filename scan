@@ -40,7 +40,9 @@ cleanup()
 }
 trap cleanup EXIT
 
-[ -e "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults" ] && . "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults"
+DEFAULTS="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults"
+SCANPRE="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
+[ -e "$DEFAULTS" ] && . "$DEFAULTS"
 
 # Parse command-line options
 while [[ $# > 0 ]]; do
@@ -148,6 +150,13 @@ if [[ $HELP == 1 ]]; then
   echo " -o, --output <outputfile>"
   echo "   Output to named file default=scan.pdf"
   echo " -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append"
+  echo ""
+  echo "CONFIGURATION"
+  echo "Local configuration can be written in the form of environment variables to:"
+  echo "  $DEFAULTS"
+  echo ""
+  echo "A pre-scan hook script can be written to:"
+  echo "  $SCANPRE"
   echo ""
   exit 0
 fi
@@ -272,7 +281,7 @@ if [[ $MODE_HW_DEFAULT == 1 ]]; then
 else
   MODE="--mode '$MODE'"
 fi
-[ -e "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre" ] && . "${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
+[ -e "$SCANPRE" ] && . "$SCANPRE"
 eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait $DESKEW $CROP $DRIVER_OPTION $SOURCE --resolution $RESOLUTION $MODE -o $TMP_DIR/scan-%04d
 # Simulate empty page scanner outputs for debugging
 #convert xc:none -page Letter $TMP_DIR/scan-0001.pdf
