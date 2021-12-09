@@ -14,6 +14,7 @@ usage()
   echo "  PGWIDTHIN"
   echo "  PGHEIGHTIN"
   echo "  SKIP_EMPTY_PAGES"
+  echo "  BRIGHTNESS"
   echo "  PS2PDF_OPTS (optional)"
   echo "  VERBOSE (optional)"
   echo "  LOCKFILE (required if VERBOSE=1)"
@@ -50,7 +51,7 @@ if [[ $# < 1 ]]; then
   exit 1
 fi
 
-if [[ "$UNPAPER" == "" || "$SEARCHABLE" == "" || "$RESOLUTION" == "" || "$RESOLUTION" == "" || "$SKIP_EMPTY_PAGES" == "" ]]; then
+if [[ "$UNPAPER" == "" || "$SEARCHABLE" == "" || "$RESOLUTION" == "" || "$RESOLUTION" == "" || "$SKIP_EMPTY_PAGES" == "" || "$BRIGHTNESS" == "" ]]; then
   usage
   exit 1
 fi
@@ -67,8 +68,12 @@ fi
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES..."
+  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, brightness=$BRIGHTNESS..."
   log "-------------------------------------------------------------------------------"
+
+  if [[ $BRIGHTNESS == 1 ]]; then
+    convert "$IMAGE_PATH" -brightness-contrast 20x10 "$IMAGE_PATH"
+  fi
 
   if [[ $SKIP_EMPTY_PAGES == 1 ]]; then
     PERCENTAGE_WHITE=$(convert "$IMAGE_PATH" -fuzz 0% -negate -threshold 0 -negate -format "%[fx:100*mean]" info:) || PERCENTAGE_WHITE=0

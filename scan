@@ -31,6 +31,7 @@ DESKEW=0
 DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
+BRIGHTNESS=0
 SOURCE=""
 
 TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
@@ -94,6 +95,8 @@ while [[ $# > 0 ]]; do
 
   -xo|--driver-options) shift; DRIVER_OPTION=$1;;
 
+  --brightness) BRIGHTNESS=1 ;;
+
   *) if [[ $USEARRAY == 1 ]]; then OUTPUTARR+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
@@ -145,6 +148,8 @@ if [[ $HELP == 1 ]]; then
   echo "   which language to use for OCR"
   echo " --skip-empty-pages"
   echo "   remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)"
+  echo " --brightness"
+  echo "   Increase brightness and contrast in post-processing"
   echo ""
   echo "OUTPUT"
   echo " -o, --output <outputfile>"
@@ -267,6 +272,7 @@ export PGWIDTHIN
 export PGHEIGHTIN
 export PS2PDF_OPTS
 export SKIP_EMPTY_PAGES
+export BRIGHTNESS
 
 if [[ $VERBOSE == 1 ]]; then
   LOCKFILE=$(mktemp)
