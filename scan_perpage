@@ -68,7 +68,7 @@ fi
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, brightness=$BRIGHTNESS..."
+  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, white-threshold=$WHITE_THRESHOLD, brightness=$BRIGHTNESS..."
   log "-------------------------------------------------------------------------------"
 
   if [[ $BRIGHTNESS == 1 ]]; then

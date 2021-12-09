@@ -31,7 +31,7 @@ DESKEW=0
 DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
-WHITE_THRESHOLD=
+WHITE_THRESHOLD=99.8
 BRIGHTNESS=0
 SOURCE=""
 
@@ -86,7 +86,9 @@ while [[ $# > 0 ]]; do
 
   --language) shift; LANGUAGE=$1 ;;
 
-  --skip-empty-pages) SKIP_EMPTY_PAGES=1; WHITE_THRESHOLD=$1 ;;
+  --skip-empty-pages) SKIP_EMPTY_PAGES=1 ;;
+
+  --white-threshold) shift; WHITE_THRESHOLD=$1 ;;
 
   -o|--output) shift; USEOUTPUT=1; OUTPUT="$1" ;;
 
@@ -147,9 +149,10 @@ if [[ $HELP == 1 ]]; then
   echo "   Run OCR to make the PDF searchable (requires tesseract)"
   echo " --language <lang>"
   echo "   which language to use for OCR"
-  echo " --skip-empty-pages <threshold>"
+  echo " --skip-empty-pages"
   echo "   remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)"
-  echo "   the threshold to identify an empty page is a percentage value between 0 and 100. The default is 99.8"
+  echo " --white-threshold"
+  echo "   threshold to identify an empty page is a percentage value between 0 and 100. The default is 99.8"
   echo " --brightness"
   echo "   Increase brightness and contrast in post-processing"
   echo ""
@@ -263,9 +266,6 @@ fi
 if [[ $SKIP_EMPTY_PAGES == 1 && ! -x "$(command -v bc)" ]]; then
   echo >&2 'Warning: `--skip-empty-pages` specified, but `bc` not available. Disabling empty page detection.'
   SKIP_EMPTY_PAGES=0
-fi
-if [[ $SKIP_EMPTY_PAGES == 1 && $WHITE_THRESHOLD == "" ]]; then
-  WHITE_THRESHOLD=99.8
 fi
 
 export VERBOSE
