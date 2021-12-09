@@ -83,7 +83,7 @@ process_page() {
   fi
 
   PP_PREFIX=
-  if [[ $SKIP_EMPTY_PAGES == 1 && $(echo "$PERCENTAGE_WHITE > 99.8" | bc -l) == 1 ]]; then
+  if [[ $SKIP_EMPTY_PAGES == 1 && $(echo "$PERCENTAGE_WHITE > $WHITE_THRESHOLD" | bc -l) == 1 ]]; then
     log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
   else
     if [[ $UNPAPER == 1 ]]; then
