@@ -14,7 +14,7 @@ usage()
   echo "  PGWIDTHIN"
   echo "  PGHEIGHTIN"
   echo "  SKIP_EMPTY_PAGES"
-  echo "  BRIGHTNESS"
+  echo "  BRIGHTNESS_CONTRAST"
   echo "  PS2PDF_OPTS (optional)"
   echo "  VERBOSE (optional)"
   echo "  LOCKFILE (required if VERBOSE=1)"
@@ -51,7 +51,7 @@ if [[ $# < 1 ]]; then
   exit 1
 fi
 
-if [[ "$UNPAPER" == "" || "$SEARCHABLE" == "" || "$RESOLUTION" == "" || "$RESOLUTION" == "" || "$SKIP_EMPTY_PAGES" == "" || "$BRIGHTNESS" == "" ]]; then
+if [[ "$UNPAPER" == "" || "$SEARCHABLE" == "" || "$RESOLUTION" == "" || "$RESOLUTION" == "" || "$SKIP_EMPTY_PAGES" == "" ]]; then
   usage
   exit 1
 fi
@@ -68,11 +68,12 @@ fi
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, white-threshold=$WHITE_THRESHOLD, brightness=$BRIGHTNESS..."
+  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, white-threshold=$WHITE_THRESHOLD, brightness-contrast-sw=$BRIGHTNESS_CONTRAST..."
   log "-------------------------------------------------------------------------------"
 
-  if [[ $BRIGHTNESS == 1 ]]; then
-    convert "$IMAGE_PATH" -brightness-contrast 20x10 "$IMAGE_PATH"
+  if [[ "$BRIGHTNESS_CONTRAST" != "" ]]; then
+	log "Adjust brightness and contrast in ImageMagick by $BRIGHTNESS_CONTRAST"
+    convert "$IMAGE_PATH" -brightness-contrast $BRIGHTNESS_CONTRAST "$IMAGE_PATH"
   fi
 
   if [[ $SKIP_EMPTY_PAGES == 1 ]]; then

@@ -32,7 +32,7 @@ DRIVER_OPTION=
 VERBOSE=0
 SKIP_EMPTY_PAGES=0
 WHITE_THRESHOLD=99.8
-BRIGHTNESS=0
+BRIGHTNESS_CONTRAST=
 SOURCE=""
 
 TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
@@ -98,7 +98,7 @@ while [[ $# > 0 ]]; do
 
   -xo|--driver-options) shift; DRIVER_OPTION=$1;;
 
-  --brightness) BRIGHTNESS=1 ;;
+  --brightness-contrast-sw) shift; BRIGHTNESS_CONTRAST=$1 ;;
 
   *) if [[ $USEARRAY == 1 ]]; then OUTPUTARR+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
@@ -153,8 +153,9 @@ if [[ $HELP == 1 ]]; then
   echo "   remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)"
   echo " --white-threshold"
   echo "   threshold to identify an empty page is a percentage value between 0 and 100. The default is 99.8"
-  echo " --brightness"
-  echo "   Increase brightness and contrast in post-processing"
+  echo " --brightness-contrast-sw"
+  echo "   Alter brightness and contrast via post-processing - prefer specifying brightness and/or"
+  echo "   contrast via --driver-options if supported by your hardware."
   echo ""
   echo "OUTPUT"
   echo " -o, --output <outputfile>"
@@ -278,7 +279,7 @@ export PGHEIGHTIN
 export PS2PDF_OPTS
 export SKIP_EMPTY_PAGES
 export WHITE_THRESHOLD
-export BRIGHTNESS
+export BRIGHTNESS_CONTRAST
 
 if [[ $VERBOSE == 1 ]]; then
   LOCKFILE=$(mktemp)
