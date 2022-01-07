@@ -14,6 +14,7 @@ usage()
   echo "  PGWIDTHIN"
   echo "  PGHEIGHTIN"
   echo "  SKIP_EMPTY_PAGES"
+  echo "  BRIGHTNESS_CONTRAST"
   echo "  PS2PDF_OPTS (optional)"
   echo "  VERBOSE (optional)"
   echo "  LOCKFILE (required if VERBOSE=1)"
@@ -67,8 +68,13 @@ fi
 process_page() {
   log ""
   log "-------------------------------------------------------------------------------"
-  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES..."
+  log "Post-processing scanned page ${IMAGE_PATH}, deskew=$UNPAPER, searchable=$SEARCHABLE, skip-empty-pages=$SKIP_EMPTY_PAGES, white-threshold=$WHITE_THRESHOLD, brightness-contrast-sw=$BRIGHTNESS_CONTRAST..."
   log "-------------------------------------------------------------------------------"
+
+  if [[ "$BRIGHTNESS_CONTRAST" != "" ]]; then
+	log "Adjust brightness and contrast in ImageMagick by $BRIGHTNESS_CONTRAST"
+    convert "$IMAGE_PATH" -brightness-contrast $BRIGHTNESS_CONTRAST "$IMAGE_PATH"
+  fi
 
   if [[ $SKIP_EMPTY_PAGES == 1 ]]; then
     PERCENTAGE_WHITE=$(convert "$IMAGE_PATH" -fuzz 0% -negate -threshold 0 -negate -format "%[fx:100*mean]" info:) || PERCENTAGE_WHITE=0
@@ -78,7 +84,7 @@ process_page() {
   fi
 
   PP_PREFIX=
-  if [[ $SKIP_EMPTY_PAGES == 1 && $(echo "$PERCENTAGE_WHITE > 99.8" | bc -l) == 1 ]]; then
+  if [[ $SKIP_EMPTY_PAGES == 1 && $(echo "$PERCENTAGE_WHITE > $WHITE_THRESHOLD" | bc -l) == 1 ]]; then
     log "Skipping empty page $IMAGE_FILE with white percentage $PERCENTAGE_WHITE"
   else
     if [[ $UNPAPER == 1 ]]; then
