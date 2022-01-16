@@ -285,8 +285,6 @@ export SKIP_EMPTY_PAGES
 export WHITE_THRESHOLD
 export BRIGHTNESS_CONTRAST
 
-echo "DEVICE=[$DEVICE]"
-
 if [[ $VERBOSE == 1 ]]; then
   LOCKFILE=$(mktemp)
   trap "cleanup; rm -rf $LOCKFILE" EXIT
