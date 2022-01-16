@@ -133,7 +133,7 @@ if [[ $HELP == 1 ]]; then
   echo " -pw, --page-width"
   echo "   Custom Page Width in mm"
   echo " -x, --device"
-  echo "  Override scanner device name, defaulting to \"$DEVICE\""
+  echo "  Override scanner device name, defaulting to \"$DEVICE\", pass an empty value for no device arg"
   echo " -xo, --driver-options"
   echo "  Send additional options to the scanner driver e.g."
   echo "  -xo \"--whatever bar --frobnitz baz\""
@@ -269,6 +269,10 @@ if [[ $SKIP_EMPTY_PAGES == 1 && ! -x "$(command -v bc)" ]]; then
   SKIP_EMPTY_PAGES=0
 fi
 
+if [[ "$DEVICE" != "" ]]; then
+  DEVICE="-d \"$DEVICE\""
+fi
+
 export VERBOSE
 export UNPAPER
 export SEARCHABLE
@@ -281,6 +285,8 @@ export SKIP_EMPTY_PAGES
 export WHITE_THRESHOLD
 export BRIGHTNESS_CONTRAST
 
+echo "DEVICE=[$DEVICE]"
+
 if [[ $VERBOSE == 1 ]]; then
   LOCKFILE=$(mktemp)
   trap "cleanup; rm -rf $LOCKFILE" EXIT
@@ -288,14 +294,14 @@ if [[ $VERBOSE == 1 ]]; then
 fi;
 
 echo >&2 "Scanning..."
-#eval strace -f -o /tmp/scan-trace.txt scanadf -d $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
+#eval strace -f -o /tmp/scan-trace.txt scanadf $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait --resolution $RESOLUTION --mode $MODE $DESKEW $CROP $SOURCE -o scan-%04d
 if [[ $MODE_HW_DEFAULT == 1 ]]; then
   MODE=
 else
   MODE="--mode '$MODE'"
 fi
 [ -e "$SCANPRE" ] && . "$SCANPRE"
-eval scanadf -d \'"$DEVICE"\' $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait $DESKEW $CROP $DRIVER_OPTION $SOURCE --resolution $RESOLUTION $MODE -o $TMP_DIR/scan-%04d
+eval scanadf $DEVICE $MAXPAGE $PGHEIGHT $PGWIDTH -S $SCRIPT --script-wait $DESKEW $CROP $DRIVER_OPTION $SOURCE --resolution $RESOLUTION $MODE -o $TMP_DIR/scan-%04d
 # Simulate empty page scanner outputs for debugging
 #convert xc:none -page Letter $TMP_DIR/scan-0001.pdf
 
