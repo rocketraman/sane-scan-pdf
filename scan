@@ -165,9 +165,23 @@ if [[ $HELP == 1 ]]; then
   echo "CONFIGURATION"
   echo "Local configuration can be written in the form of environment variables to:"
   echo "  $DEFAULTS"
+  if [[ -e "$DEFAULTS" ]]; then
+    echo ""
+    echo "This file exists and currently contains:"
+    echo "-----"
+    cat "$DEFAULTS"
+    echo "-----"
+  fi
   echo ""
   echo "A pre-scan hook script can be written to:"
   echo "  $SCANPRE"
+  if [[ -e "$SCANPRE" ]]; then
+    echo ""
+    echo "This file exists and currently contains:"
+    echo "-----"
+    cat "$SCANPRE"
+    echo "-----"
+  fi
   echo ""
   exit 0
 fi
