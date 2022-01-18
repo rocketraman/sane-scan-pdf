@@ -123,6 +123,13 @@ you will need to use the `-x`/`--device` argument to specify your scanner,
 or save a `DEVICE=something` line to a local config file as shown above.
 See below for how to get the list of available devices.
 
+If running via `scanbd`, scanning occurs via the `net` driver rather than the
+usual device driver. In this case, it may be necessary to specify the net
+driver device in the `scanbd` script, OR perhaps do not specify any device
+at all to let the script choose the best device when running outside of
+`scanbd`, and when running via `scanbd`. To do this, use an empty device
+i.e. `--device ""`.
+
 The scanners and scanner drivers vary in features they support. This script
 provides several options to the underlying scanner driver by default, and
 these options may not be supported by your scanner/scanner driver. If
