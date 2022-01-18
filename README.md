@@ -161,6 +161,14 @@ With assistance from
 [various other contributors](https://github.com/rocketraman/sane-scan-pdf/graphs/contributors)!
 Thank you!
 
+## Blog Post Mentions
+
+The following blog posts talk about scanner automation, and mention use of this
+script. If you create a blog post, please submit a PR and add your link here!
+
+* [Stefan Armbruster - Jan 1, 2019 - Running Paperless on FreeNAS](https://blog.armbruster-it.de/2019/01/running-paperless-on-freenas/)
+* [Chris Schuld - Jan 8, 2020 - Network Scanner with Fujitsu ScanSnap and a Raspberry Pi](https://chrisschuld.com/2020/01/network-scanner-with-scansnap-and-raspberry-pi/)
+
 ## Other Useful Software
 
 * [OCRmyPDF](https://github.com/jbarlow83/OCRmyPDF) - forgot to use the `--ocr` option at scanning time? use this
