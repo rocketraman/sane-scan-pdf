@@ -131,13 +131,13 @@ List available device-specific options, including acceptable values for
 scanadf [-d <device>] --help
 ```
 
-## Author
+## Author(s)
 
 * [Raman Gupta](https://github.com/rocketraman/)
 
-## Contributors
-
-* [Stefan Armbruster](https://github.com/sarmbruster/)
+With assistance from
+[various other contributors](https://github.com/rocketraman/sane-scan-pdf/graphs/contributors)!
+Thank you!
 
 ## Other Useful Software
 
