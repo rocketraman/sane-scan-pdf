@@ -62,7 +62,7 @@ OPTIONS
  -e, --max <pages>
    Max number of pages e.g. 2 (default is all pages)
  -t, --truncate <pages>
-   Truncate number of pages from end e.g. 1 (default is none)
+   Truncate number of pages from end e.g. 1 (default is none) -- truncation happens after --skip-empty-pages
  -s, --size
    Page Size as type e.g. Letter (default), Legal, A4, no effect if --crop is specified
  -ph, --page-height
@@ -70,7 +70,12 @@ OPTIONS
  -pw, --page-width
    Custom Page Width in mm
  -x, --device
-   Override scanner device name, defaulting to `fujitsu`
+   Override scanner device name, defaulting to "fujitsu", pass an empty value for no device arg
+ -xo, --driver-options
+   Send additional options to the scanner driver e.g.
+   -xo "--whatever bar --frobnitz baz"
+ --no-default-size
+   Disable default page size, useful if driver does not support page size/location arguments
  --crop
    Crop to contents (driver must support this)
  --deskew
@@ -78,14 +83,24 @@ OPTIONS
  --unpaper
    Run post-processing deskew and black edge detection (requires unpaper)
  --ocr
-   Run OCR to make the PDF searchable (requires tesseract and ImageMagick)
+   Run OCR to make the PDF searchable (requires tesseract)
+ --language <lang>
+   which language to use for OCR
  --skip-empty-pages
    remove empty pages from resulting PDF document (e.g. one sided doc in duplex mode)
+ --white-threshold
+   threshold to identify an empty page is a percentage value between 0 and 100. The default is 99.8
+ --brightness-contrast-sw
+   Alter brightness and contrast via post-processing - prefer specifying brightness and/or
+   contrast via --driver-options if supported by your hardware.
 
 OUTPUT
  -o, --output <outputfile>
    Output to named file default=scan.pdf
  -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
+
+CONFIGURATION
+<not shown, system-specific, run `--help` locally>
 ```
 
 ### Configuration
