@@ -44,6 +44,7 @@ trap cleanup EXIT
 
 DEFAULTS="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults"
 SCANPRE="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
+
 [ -e "$DEFAULTS" ] && . "$DEFAULTS"
 
 # Parse command-line options
@@ -117,7 +118,7 @@ if [[ $HELP == 1 ]]; then
   echo " -m, --mode"
   echo "   Mode e.g. Lineart (default), Halftone, Gray, Color, etc. Use --mode-hw-default to not set any mode"
   echo " --mode-hw-default"
-  echo "   Do not set the mode explicitly, use the hardware default"
+  echo "   Do not set the mode explicitly, use the hardware default — ignored if --mode is set"
   echo " -r, --resolution"
   echo "   Resolution e.g 300 (default)"
   echo " -a, --append"
@@ -191,9 +192,8 @@ if [[ $USEARRAY == 1 && $USEOUTPUT == 1 ]]; then
   exit 1
 fi
 
-if [[ $MODE_CHANGED == 1 && $MODE_HW_DEFAULT == 1 ]]; then
-  echo >&2 "Use one of -m/--mode or --mode-hardware-default. Aborting."
-  exit 1
+if [[ $MODE_CHANGED == 1 ]]; then
+  MODE_HW_DEFAULT=0
 fi
 
 if [[ $MODE_CHANGED == 0 && $MODE_HW_DEFAULT == 0 ]]; then
