@@ -19,6 +19,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Specify page width and height for odd size pages, or common sizes (Letter, Legal, A4)
 * Performance: scanner run in parallel with page post-processing
 * Limit parallel processing for very fast scanners or constrained environments (if sem installed)
+* Post-scan open scan output(s) in viewer
 
 ## Requirements
 
@@ -55,7 +56,7 @@ OPTIONS
  -m, --mode
    Mode e.g. Lineart (default), Halftone, Gray, Color, etc. Use --mode-hw-default to not set any mode
  --mode-hw-default
-   Do not set the mode explicitly, use the hardware default
+   Do not set the mode explicitly, use the hardware default — ignored if --mode is set
  -r, --resolution
    Resolution e.g 300 (default)
  -a, --append
@@ -94,11 +95,8 @@ OPTIONS
  --brightness-contrast-sw
    Alter brightness and contrast via post-processing - prefer specifying brightness and/or
    contrast via --driver-options if supported by your hardware.
-
-OUTPUT
- -o, --output <outputfile>
-   Output to named file default=scan.pdf
- -l, --outputlist <outputfile-1...outputfile-n> Output to named files for each scanned page, can be used with append
+ --open
+   After scanning, open the scan via xdg-open
 
 CONFIGURATION
 <not shown, system-specific, run `--help` locally>
