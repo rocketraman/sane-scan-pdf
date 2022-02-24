@@ -39,6 +39,7 @@ Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Ins
 * tesseract (to make searchable PDFs)
 * sem (via gnu-parallels, to constrain resource usage during page processing)
 * bc (for whitepage detection percentage calculations)
+* xdg-open (for opening scan after completion)
 
 ## Getting Started
 

@@ -34,6 +34,7 @@ SKIP_EMPTY_PAGES=0
 WHITE_THRESHOLD=99.8
 BRIGHTNESS_CONTRAST=
 SOURCE=""
+OPENSCAN=0
 
 TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
 cleanup()
@@ -101,6 +102,8 @@ while [[ $# > 0 ]]; do
 
   --brightness-contrast-sw) shift; BRIGHTNESS_CONTRAST=$1 ;;
 
+  --open) OPENSCAN=1 ;;
+
   *) if [[ $USEARRAY == 1 ]]; then OUTPUTARR+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
   esac
@@ -157,6 +160,8 @@ if [[ $HELP == 1 ]]; then
   echo " --brightness-contrast-sw"
   echo "   Alter brightness and contrast via post-processing - prefer specifying brightness and/or"
   echo "   contrast via --driver-options if supported by your hardware."
+  echo " --open"
+  echo "   After scanning, open the scan via xdg-open"
   echo ""
   echo "OUTPUT"
   echo " -o, --output <outputfile>"
@@ -379,6 +384,9 @@ if (( numscans > 0 )); then
   fi
   echo ""
   echo "Done."
+  if [[ $OPENSCAN == 1 && -x "$(command -v xdg-open)" ]]; then
+    for x in "${OUTPUT[@]}"; do xdg-open "$x"; done;
+  fi
 else
   echo "Found no scans."
 fi
