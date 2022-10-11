@@ -120,7 +120,7 @@ process_page() {
       runconstrained $TIMEVERBOSE pnmtops $PNMVERBOSE $PAGEOPTS $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE > $IMAGE_DIR/${IMAGE_FILE}.ps | logstdout
       log "...Running ps2pdf on $IMAGE_DIR/${IMAGE_FILE}.ps"
       runconstrained $TIMEVERBOSE ps2pdf $PS2PDF_OPTS $IMAGE_DIR/${IMAGE_FILE}.ps $IMAGE_DIR/${IMAGE_FILE}.pdf | logstdout
-      [[ -f $IMAGE_DIR/${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/$PP_PREFIX${IMAGE_FILE}.ps
+      [[ -f $IMAGE_DIR/${IMAGE_FILE}.ps ]] && rm $IMAGE_DIR/${IMAGE_FILE}.ps
     fi    
   fi
 
