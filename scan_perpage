@@ -93,8 +93,8 @@ process_page() {
       if [[ $VERBOSE == 1 ]]; then
         UNPAPERVERBOSE="-v"
       fi
-      #runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
-      runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --overwrite --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
+      #runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --no-mask-scan --overwrite --deskew-scan-range=35 --dpi $RESOLUTION --no-blackfilter $IMAGE_FILE $PP_PREFIX$IMAGE_FILE | logstdout
+      runconstrained $TIMEVERBOSE unpaper $UNPAPERVERBOSE --overwrite --deskew-scan-range=35 --dpi $RESOLUTION $IMAGE_PATH $IMAGE_DIR/$PP_PREFIX$IMAGE_FILE | logstdout
     fi
     if [[ $SEARCHABLE == 1 ]]; then
       log "Converting image data to searchable pdf..."
