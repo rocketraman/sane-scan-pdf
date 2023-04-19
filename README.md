@@ -20,6 +20,7 @@ Tested and run regularly on Fedora, but should work on other distributions with 
 * Performance: scanner run in parallel with page post-processing
 * Limit parallel processing for very fast scanners or constrained environments (if sem installed)
 * Post-scan open scan output(s) in viewer
+* Configuration via default and named option groups
 
 ## Requirements
 
@@ -97,6 +98,9 @@ OPTIONS
    contrast via --driver-options if supported by your hardware.
  --open
    After scanning, open the scan via xdg-open
+ -og, --option-group
+   A named option group. Useful for saving collections of options under a name e.g. 'receipt' for easy reuse.
+   Use this option in combination with '--help' to show the location and content of the file and edit it manually.
 
 CONFIGURATION
 <not shown, system-specific, run `--help` locally>
@@ -114,6 +118,25 @@ DEVICE=something
 SEARCHABLE=1
 MODE_HW_DEFAULT=1
 ```
+
+Command line argument `--option-group foo` (or `-og foo`) will read the
+`foo` file in the standard XDG home config directory (use `-og foo --help`
+to see the exact location) for configuration.
+
+For example, if one wishes to scan receipts always with crop, deskew, unpaper
+post-processing, and making them searchable via OCR, a `receipt` option group
+can be created by writing the following to a file named `recept` in the
+config directory:
+
+```
+CROP=1
+DESKEW=1
+UNPAPER=1
+SEARCHABLE=1
+```
+
+Command-line arguments will overwride settings in the default and named
+configurations.
 
 ### Tips
 
