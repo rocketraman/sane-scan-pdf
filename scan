@@ -35,6 +35,7 @@ WHITE_THRESHOLD=99.8
 BRIGHTNESS_CONTRAST=
 SOURCE=""
 OPENSCAN=0
+OPTION_GROUP=""
 
 TMP_DIR=$(mktemp -d -p "" scan.XXXXXXXXXX)
 cleanup()
@@ -48,7 +49,35 @@ SCANPRE="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
 
 [ -e "$DEFAULTS" ] && . "$DEFAULTS"
 
-# Parse command-line options
+# copy the args
+args=("$@")
+
+# Parse command-line options that change how settings are read first
+# This way, things like preset option groups can be set first, then overwritten by explicit args
+while [[ $# > 0 ]]; do
+  case "$1" in
+
+  -h|--help) HELP=1 ;;
+
+  -og|--option-group) shift; OPTION_GROUP="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/$1" ;;
+
+  esac
+  shift   # next option
+done
+
+if [[ -f "$OPTION_GROUP" ]]; then
+  . "$OPTION_GROUP"
+elif [[ "$OPTION_GROUP" != "" && $HELP == 0 ]]; then
+  echo "2"
+  echo >&2 "Warning: '--option-group' specified, but the corresponding file $OPTION_GROUP does not exist."
+else
+  echo "3"
+fi
+
+# reset the args
+set -- "${args[@]}"
+
+# Parse other command-line options, these will now overwrite anything set via defaults or option groups
 while [[ $# > 0 ]]; do
   case "$1" in
 
@@ -68,7 +97,8 @@ while [[ $# > 0 ]]; do
 
   -t|--truncate) shift; TRUNCPAGE=$1 ;;
 
-  -h|--help) HELP=1 ;;
+  # ignore, already handled
+  -h|--help) shift ;;
 
   -s|--size) shift; SIZE=$1 ;;
 
@@ -96,13 +126,16 @@ while [[ $# > 0 ]]; do
 
   -l|--outputlist) shift; USEARRAY=1; OUTPUTARR=(); OUTPUTARR+=("$1") ;;
 
-  -x|--device) shift; DEVICE="$1";;
+  -x|--device) shift; DEVICE="$1" ;;
 
-  -xo|--driver-options) shift; DRIVER_OPTION=$1;;
+  -xo|--driver-options) shift; DRIVER_OPTION=$1 ;;
 
   --brightness-contrast-sw) shift; BRIGHTNESS_CONTRAST=$1 ;;
 
   --open) OPENSCAN=1 ;;
+
+  # ignore, already handled
+  -og|--option-group) shift ;;
 
   *) if [[ $USEARRAY == 1 ]]; then OUTPUTARR+=("$1"); else echo >&2 "Unknown argument: $1"; exit 1; fi ;;
 
@@ -162,6 +195,9 @@ if [[ $HELP == 1 ]]; then
   echo "   contrast via --driver-options if supported by your hardware."
   echo " --open"
   echo "   After scanning, open the scan via xdg-open"
+  echo " -og, --option-group"
+  echo "   A named option group. Useful for saving collections of options under a name e.g. 'receipt' for easy reuse."
+  echo "   Use this option in combination with '--help' to show the location and content of the file and edit it manually."
   echo ""
   echo "OUTPUT"
   echo " -o, --output <outputfile>"
@@ -176,6 +212,16 @@ if [[ $HELP == 1 ]]; then
     echo "This file exists and currently contains:"
     echo "-----"
     cat "$DEFAULTS"
+    echo "-----"
+  fi
+  echo ""
+  echo "A named option group can be written based on the '--option-group' argument. Current:"
+  echo "  $OPTION_GROUP"
+  if [[ -e "$OPTION_GROUP" ]]; then
+    echo ""
+    echo "This file exists and currently contains:"
+    echo "-----"
+    cat "$OPTION_GROUP"
     echo "-----"
   fi
   echo ""
