@@ -258,6 +258,13 @@ case "$SIZE" in
 
 esac
 
+if [[ $DESKEW == 1 ]]; then
+  if [[ $CROP != 1 ]]; then
+    echo >&2 'Warning: `--deskew` specified, but `--crop` not specified. It is recommended to scan at max height/width and then crop to give deskew the best chance of working correctly.'
+  fi
+  DESKEW="--swdeskew=yes"
+fi
+
 if [[ $CROP != 1 && "$PGHEIGHT" != "" ]]; then
   PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
   PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
@@ -277,10 +284,6 @@ if [[ $CROP == 1 ]]; then
   PGHEIGHT="--page-height 9999 -y 9999"
   PGWIDTH="--page-width 9999 -x 9999"
   PS2PDF_OPTS="-dEPSCrop"
-fi
-
-if [[ $DESKEW == 1 ]]; then
-  DESKEW="--swdeskew=yes"
 fi
 
 if [[ $SKIP_EMPTY_PAGES == 1 && ! -x "$(command -v bc)" ]]; then
