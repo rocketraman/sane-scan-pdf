@@ -83,15 +83,23 @@ while [[ $# > 0 ]]; do
 
   -v|--verbose) VERBOSE=1 ;;
 
+  --no-verbose) VERBOSE=0 ;;
+
   -d|--duplex) DUPLEX=1 ;;
+
+  -d|--no-duplex) DUPLEX=0 ;;
 
   -m|--mode) shift; MODE=$1; MODE_CHANGED=1 ;;
 
   --mode-hw-default) MODE_HW_DEFAULT=1 ;;
 
+  --no-mode-hw-default) MODE_HW_DEFAULT=0 ;;
+
   -r|--resolution) shift; RESOLUTION=$1 ;;
 
   -a|--append) APPEND=1 ;;
+
+  --no-append) APPEND=0 ;;
 
   -e|--max) shift; MAXPAGE=$1 ;;
 
@@ -110,15 +118,25 @@ while [[ $# > 0 ]]; do
 
   --crop) CROP=1 ;;
 
+  --no-crop) CROP=0 ;;
+
   --deskew) DESKEW=1 ;;
+
+  --no-deskew) DESKEW=0 ;;
 
   --unpaper) UNPAPER=1 ;;
 
+  --no-unpaper) UNPAPER=0 ;;
+
   --searchable|--ocr) SEARCHABLE=1 ;;
+
+  --no-searchable|--no-ocr) SEARCHABLE=0 ;;
 
   --language) shift; LANGUAGE=$1 ;;
 
   --skip-empty-pages) SKIP_EMPTY_PAGES=1 ;;
+
+  --no-skip-empty-pages) SKIP_EMPTY_PAGES=0 ;;
 
   --white-threshold) shift; WHITE_THRESHOLD=$1 ;;
 
@@ -133,6 +151,8 @@ while [[ $# > 0 ]]; do
   --brightness-contrast-sw) shift; BRIGHTNESS_CONTRAST=$1 ;;
 
   --open) OPENSCAN=1 ;;
+
+  --no-open) OPENSCAN=0 ;;
 
   # ignore, already handled
   -og|--option-group) shift ;;

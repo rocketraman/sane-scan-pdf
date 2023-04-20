@@ -125,7 +125,7 @@ to see the exact location) for configuration.
 
 For example, if one wishes to scan receipts always with crop, deskew, unpaper
 post-processing, and making them searchable via OCR, a `receipt` option group
-can be created by writing the following to a file named `recept` in the
+can be created by writing the following to a file named `receipt` in the
 config directory:
 
 ```
@@ -136,7 +136,13 @@ SEARCHABLE=1
 ```
 
 Command-line arguments will overwride settings in the default and named
-configurations.
+configurations. All command line flags support prefixing with `no-` in order to
+override configuration settings. For example, to scan receipts using the option
+group above, but without making it searchable, you would do:
+
+```
+--option-group receipt --no-searchable
+```
 
 ### Tips
 
