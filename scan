@@ -35,6 +35,7 @@ SKIP_EMPTY_PAGES=0
 WHITE_THRESHOLD=99.8
 BRIGHTNESS_CONTRAST=
 SOURCE=""
+SOURCE_DUPLEX="ADF Duplex"
 OPENSCAN=0
 OPTION_GROUP=""
 
@@ -86,6 +87,10 @@ while [[ $# > 0 ]]; do
   -d|--duplex) DUPLEX=1 ;;
 
   -d|--no-duplex) DUPLEX=0 ;;
+
+  --source) shift; SOURCE="$1" ;;
+
+  --source-duplex) shift; SOURCE_DUPLEX="$1" ;;
 
   -m|--mode) shift; MODE=$1; MODE_CHANGED=1 ;;
 
@@ -171,6 +176,10 @@ if [[ $HELP == 1 ]]; then
   echo "   Verbose output (this will slow down the scan due to the need to prevent interleaved output)"
   echo " -d, --duplex"
   echo "   Duplex scanning"
+  echo " --source"
+  echo "   Explicitly specify a source for the scan e.g. ADF, Flatbed, etc. If not specified, the driver default is used."
+  echo " --source-duplex"
+  echo "   Explicitly specify a source for duplex scans e.g. ADF Duplex, Flatbed, etc. Defaults to \"ADF Duplex\""
   echo " -m, --mode"
   echo "   Mode e.g. Lineart (default), Halftone, Gray, Color, etc. Use --mode-hw-default to not set any mode"
   echo " --mode-hw-default"
@@ -301,8 +310,12 @@ if [[ $USEARRAY == 1 ]]; then
   OUTPUT=("${OUTPUTARR[@]}")
 fi
 
+# source defaults to the empty string "" which is the default source for the driver
+# but duplex needs to be explicit
 if [[ $DUPLEX == 1 ]]; then
-  SOURCE="--source \"ADF Duplex\""
+  SOURCE="--source \"$SOURCE_DUPLEX\""
+elif [[ "$SOURCE" != "" ]]; then
+  SOURCE="--source \"$SOURCE\""
 fi
 
 if [[ "$MAXPAGE" != "" ]]; then
