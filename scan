@@ -26,6 +26,7 @@ PGHEIGHT=
 PGHEIGHTIN=
 PGWIDTH=
 PGWIDTHIN=
+PGCENTERING=1
 CROP=0
 DESKEW=0
 DRIVER_OPTION=
@@ -68,10 +69,7 @@ done
 if [[ -f "$OPTION_GROUP" ]]; then
   . "$OPTION_GROUP"
 elif [[ "$OPTION_GROUP" != "" && $HELP == 0 ]]; then
-  echo "2"
   echo >&2 "Warning: '--option-group' specified, but the corresponding file $OPTION_GROUP does not exist."
-else
-  echo "3"
 fi
 
 # reset the args
@@ -113,6 +111,8 @@ while [[ $# > 0 ]]; do
   -ph|--page-height) shift; PGHEIGHT=$1 ;;
 
   -pw|--page-width) shift; PGWIDTH=$1 ;;
+
+  --no-page-centering) PGCENTERING=0 ;;
 
   --no-default-size) DEFAULTSIZE=0 ;;
 
@@ -189,6 +189,8 @@ if [[ $HELP == 1 ]]; then
   echo "   Custom Page Height in mm"
   echo " -pw, --page-width"
   echo "   Custom Page Width in mm"
+  echo " --no-page-centering"
+  echo "   By default, we use --page-height and --page-width parameters for centering -- if specified skip these"
   echo " -x, --device"
   echo "   Override scanner device name, defaulting to \"$DEVICE\", pass an empty value for no device arg"
   echo " -xo, --driver-options"
@@ -333,13 +335,21 @@ fi
 
 if [[ $CROP != 1 && "$PGHEIGHT" != "" ]]; then
   PGHEIGHTIN=$(units --compact -1 "$PGHEIGHT mm" 'in')
-  PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
+  if [[ $PGCENTERING == 1 ]]; then
+    PGHEIGHT="--page-height $PGHEIGHT -y $PGHEIGHT"
+  else
+    PGHEIGHT="-y $PGHEIGHT"
+  fi
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
 if [[ $CROP != 1 && "$PGWIDTH" != "" ]]; then
   PGWIDTHIN=$(units --compact -1 "$PGWIDTH mm" 'in')
-  PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
+  if [[ $PGCENTERING == 1 ]]; then
+    PGWIDTH="--page-width $PGWIDTH -x $PGWIDTH"
+  else
+    PGWIDTH="-x $PGWIDTH"
+  fi
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
@@ -347,8 +357,8 @@ if [[ $CROP == 1 ]]; then
   CROP="--swcrop=yes --ald=yes"
   # In duplex mode, the driver's buffer for the back side image will be larger than necessary, oh well
   # http://sane.10972.n7.nabble.com/Fujitsu-backend-and-iX500-scanning-page-longer-than-14-Inches-td19303.html
-  PGHEIGHT="--page-height 9999 -y 9999"
-  PGWIDTH="--page-width 9999 -x 9999"
+  PGHEIGHT="-y 9999"
+  PGWIDTH="-x 9999"
   PS2PDF_OPTS="-dEPSCrop"
 fi
 
