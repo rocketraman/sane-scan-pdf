@@ -39,7 +39,7 @@ Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Ins
 * unpaper (for software deskew)
 * flock (usually provided by util-linux) (for properly ordered verbose logs)
 * tesseract (to make searchable PDFs)
-* sem (via gnu-parallels, to constrain resource usage during page processing)
+* sem (via gnu-parallels, to constrain resource usage during page processing -- install this if you have a fast scanner)
 * bc (for whitepage detection percentage calculations)
 * xdg-open (for opening scan after completion)
 
