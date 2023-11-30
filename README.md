@@ -169,7 +169,8 @@ and see below for how to retrieve the list of modes that your system understands
 
 ### Scripts
 
-*emulate_duplex_scan.sh* Emulate a duplex scan. Scan front and backs to separate documents, then use the script to collate into one without the need to reverse the order of pages.
+*emulate_duplex_scan.sh*
+Emulate a duplex scan. Scan odd and even pages of the document to separate documents, then use the script to collate into one document without the need to reverse the order of pages.
 
 
 ### Helpful Commands
