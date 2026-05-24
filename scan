@@ -48,6 +48,15 @@ trap cleanup EXIT
 
 DEFAULTS="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/defaults"
 SCANPRE="${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/scan_pre"
+OPTION_GROUPS_AVAILABLE=("${XDG_DATA_HOME:-$HOME/.local/share}/sane-scan-pdf/"*)
+oga=()
+for value in "${OPTION_GROUPS_AVAILABLE[@]}"
+do
+  value=$(basename $value)
+  [[ $value != "defaults" && $value != "scan_pre" ]] && oga+=("$value")
+done
+OPTION_GROUPS_AVAILABLE=("${oga[@]}")
+unset oga
 
 [ -e "$DEFAULTS" ] && . "$DEFAULTS"
 
@@ -246,10 +255,14 @@ if [[ $HELP == 1 ]]; then
     echo "-----"
   fi
   echo ""
-  echo "A named option group can be written based on the '--option-group' argument. Current:"
-  echo "  $OPTION_GROUP"
+  echo "A named option group can be written based on the '--option-group' argument."
+  echo "Available option groups:"
+  if [[ "${OPTION_GROUPS_AVAILABLE[@]}" != "" ]]; then
+    echo "${OPTION_GROUPS_AVAILABLE[@]}"
+  fi
   if [[ -e "$OPTION_GROUP" ]]; then
     echo ""
+    echo "Current option group: $OPTION_GROUP"
     echo "This file exists and currently contains:"
     echo "-----"
     cat "$OPTION_GROUP"
