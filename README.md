@@ -189,6 +189,15 @@ With assistance from
 [various other contributors](https://github.com/rocketraman/sane-scan-pdf/graphs/contributors)!
 Thank you!
 
+## Funding
+
+If you find this script useful, please consider supporting its development:
+
+* [GitHub Sponsors](https://github.com/sponsors/rocketraman)
+* [Buy Me a Coffee](https://www.buymeacoffee.com/rocketraman)
+
+Thank you!
+
 ## Blog Post Mentions
 
 The following blog posts talk about scanner automation, and mention use of this
