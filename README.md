@@ -42,6 +42,7 @@ Installation](https://github.com/rocketraman/sane-scan-pdf/wiki/Dependencies-Ins
 * sem (via gnu-parallels, to constrain resource usage during page processing -- install this if you have a fast scanner)
 * bc (for whitepage detection percentage calculations)
 * xdg-open (for opening scan after completion)
+* qpdf (for collating two scan documents)
 
 ## Getting Started
 
@@ -165,6 +166,12 @@ you are receiving an error about `--page-width`/`--page-height` being
 unrecognized options, try the `--no-default-size` option. If you receive an
 error about the `--mode` value being invalid, try `--mode-hw-default`
 and see below for how to retrieve the list of modes that your system understands.
+
+### Scripts
+
+*emulate_duplex_scan.sh*
+Emulate a duplex scan. Scan odd and even pages of the document to separate documents, then use the script to collate into one document without the need to reverse the order of pages.
+
 
 ### Helpful Commands
 
